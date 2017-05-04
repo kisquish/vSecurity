@@ -1,8 +1,0 @@
-- hosts: rhel-nodes
-  roles:
-    - prerequisites
-
-
-- hosts: rhel-nodes
-  roles:
-    - standard-system-security-profile

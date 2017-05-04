@@ -1,0 +1,21 @@
+- name: installing OpenSCAP packages
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - openscap-scanner
+    - scap-security-guide
+    - scap-workbench
+
+- name: Get Information SCAP Content from ssg-rhel7-ds.xml
+  command: oscap info {{ rh_path_to_get_profiles }}ssg-rhel7-ds.xml
+  register: result
+
+- name: Displaying Lists of profiles from ssg-rhel7-ds.xml
+  debug:
+    var: result.stdout_lines
+
+- name: create directory to store results & reports
+  file:
+    path: "{{ rh_path_to_store_results }}"
+    state: directory
+    mode: 0755

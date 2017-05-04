@@ -1,1 +1,6 @@
----
+rh_path_to_store_results: /home/ec2-user/scap/
+rh_path_to_store_reports: /home/ec2-user/scap/
+rh_path_to_get_profiles: /usr/share/xml/scap/ssg/content/
+
+ub_path_to_store_results: /home/ubuntu/scap/
+ub_path_to_get_profiles:

@@ -1,0 +1,4 @@
+- name: REMEDIATE rules CCE-27209-6 & CCE-27286-4
+  include: remediate_profile_standard.yml
+
+

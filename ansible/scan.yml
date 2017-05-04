@@ -1,0 +1,8 @@
+- hosts: rh-nodes
+  roles:
+    - rh-prerequisites
+
+
+- hosts: rh-nodes
+  roles:
+    - rhel7-scan-Standard-System-Security-profile
