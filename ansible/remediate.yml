@@ -1,3 +1,15 @@
-- hosts: rh-nodes
+- hosts: rhel-nodes
   roles:
-    - rhel7-remediate-Standard-System-Security-profile
+    - rhel-prerequisites
+
+- hosts: cent-nodes
+  roles:
+    - cent-prerequisites
+
+- hosts: rhel-tailoring
+  roles:
+    - rhel7-stig-server-remediate
+
+- hosts: cent-tailoring
+  roles:
+    - cent7-stig-server-remediate

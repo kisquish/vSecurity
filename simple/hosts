@@ -1,25 +1,37 @@
-[rh-nodes]
-#<name_of_docker_host> ansible_host=<@IP_of_docker_host>
-rh-node1 ansible_host=10.12.0.9
+[rhel-tailoring]
+rhel-node1 ansible_host="{{ rhelNode1Host }}"
 
-[ub-nodes]
-ub-node1 ansible_host=10.12.0.111
+[cent-tailoring]
+cent-node1 ansible_host="{{ centNode1Host }}"
 
-[rh-nodes:vars]
+
+[rhel-nodes:children]
+rhel-tailoring
+
+[cent-nodes:children]
+cent-tailoring
+
+[rhel-nodes:vars]
 #ansible_user=<name_of_remote_user>
 #ansible_ssh_private_key_file=<path_to_private_ssh-key_on_workstation>
-ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
-ansible_user=ec2-user
-ansible_ssh_user=ec2-user
+#ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
+ansible_ssh_private_key_file={{ pathToKey }}
+ansible_user={{rhRemoteUser}}
+ansible_ssh_user={{rhRemoteUser}}
 become_method=sudo
 ansible_become=True
 
 
-[ub-nodes:vars]
+[cent-nodes:vars]
 #ansible_user=<name_of_remote_user>
-ansible_user=ubuntu
 #ansible_ssh_private_key_file=<path_to_private_ssh-key_on_workstation>
-ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
+#ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
+ansible_ssh_private_key_file={{ pathToKey }}
+ansible_user={{centRemoteUser}}
+ansible_ssh_user={{centRemoteUser}}
+become_method=sudo
+ansible_become=True
+
 
 #ansible_become=true 
 #ansible_user= 

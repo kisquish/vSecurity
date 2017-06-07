@@ -1,8 +1,15 @@
-- hosts: rh-nodes
+- hosts: rhel-nodes
   roles:
-    - rh-prerequisites
+    - rhel-prerequisites
 
-
-- hosts: rh-nodes
+- hosts: cent-nodes
   roles:
-    - rhel7-scan-Standard-System-Security-profile
+    - cent-prerequisites
+
+- hosts: rhel-tailoring
+  roles:
+    - rhel7-stig-server-scan
+
+# - hosts: cent-tailoring
+#   roles:
+#     - cent7-stig-server-scan

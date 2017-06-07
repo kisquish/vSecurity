@@ -1,2 +1,0 @@
-- name: evaluate Standard System Security Profile
-  include: eval_profile_standard.yml
