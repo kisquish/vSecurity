@@ -21,7 +21,7 @@
     var: result.stdout_lines
 
 - name: SCAN The system to evaluate STIG SERVER TAILORING Profile
-  command: oscap xccdf eval --profile {{ rhStigServerTailoringProfileId }} --results-arf {{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanResultName }} --report {{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanReportName }} --tailoring-file {{ rhRemoteScapDirectory }}ssg-rhel7-ds-tailoring.xml {{ rhRemoteScapDirectory }}ssg-rhel7-ds.xml
+  command: oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_stig-rhel7-disa_customized --results-arf {{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanResultName }} --report {{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanReportName }} --tailoring-file {{ rhRemoteScapDirectory }}ssg-rhel7-ds-tailoring.xml {{ rhRemoteScapDirectory }}ssg-rhel7-ds.xml
   register: output
   ignore_errors: yes
 

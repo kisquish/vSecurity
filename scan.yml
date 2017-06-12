@@ -6,6 +6,6 @@
   roles:
     - cent-prerequisites
 
-- hosts: rhel-tailoring
+- hosts: redhat
   roles:
     - rhel7-stig-server-scan

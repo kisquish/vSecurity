@@ -19,8 +19,8 @@ rhel7-server
 [centos:children]
 cent7-server
 
-#[redhat:vars]
-#ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
+[redhat:vars]
+ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
 #ansible_ssh_private_key_file={{ pathToKey }}
 #ansible_user={{rhRemoteUser}}
 #ansible_ssh_user={{rhRemoteUser}}
@@ -28,8 +28,8 @@ cent7-server
 #ansible_become=True
 
 
-#[centos:vars]
-##ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
+[centos:vars]
+ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
 #ansible_ssh_private_key_file={{ pathToKey }}
 #ansible_user={{cent7RemoteUser}}
 #ansible_ssh_user={{cent7RemoteUser}}
