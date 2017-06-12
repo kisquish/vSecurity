@@ -1,2 +1,5 @@
----
-# tasks file for roles/cent7-stig-server-remediate
+- name: REMEDIATION of FAILLED RULES
+  include: failRules.yml
+
+- name: MAKE SURE PASS RULES ARE STILL CORRECTS
+  include: passRules.yml

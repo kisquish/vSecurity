@@ -1,0 +1,11 @@
+- hosts: redhat
+  roles:
+    - rhel-prerequisites
+
+- hosts: centos
+  roles:
+    - cent-prerequisites
+
+- hosts: rhel-tailoring
+  roles:
+    - rhel7-stig-server-scan

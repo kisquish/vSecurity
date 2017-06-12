@@ -1,0 +1,15 @@
+- hosts: redhat
+  roles:
+    - rhel-prerequisites
+
+- hosts: centos
+  roles:
+    - cent-prerequisites
+
+- hosts: redhat
+  roles:
+    - rhel7-stig-server-remediate
+
+- hosts: centos
+  roles:
+    - cent7-stig-server-remediate
