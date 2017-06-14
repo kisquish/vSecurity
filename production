@@ -9,7 +9,7 @@ ec2-54-229-203-198.eu-west-1.compute.amazonaws.com
 # group of centOS servers
 [cent7-server]
 ec2-34-249-16-137.eu-west-1.compute.amazonaws.com
-ec2-54-246-234-47.eu-west-1.compute.amazonaws.com
+ec2-54-76-209-254.eu-west-1.compute.amazonaws.com
 
 # all RedHat servers
 [redhat:children]
@@ -19,9 +19,9 @@ rhel7-server
 [centos:children]
 cent7-server
 
-[redhat:vars]
-ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
-#ansible_ssh_private_key_file={{ pathToKey }}
+#[redhat:vars]
+#ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
+##ansible_ssh_private_key_file={{ pathToKey }}
 #ansible_user={{rhRemoteUser}}
 #ansible_ssh_user={{rhRemoteUser}}
 #become_method=sudo
@@ -29,7 +29,7 @@ ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
 
 
 [centos:vars]
-ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
+#ansible_ssh_private_key_file=/home/ec2-user/.ssh/a-scap.pem
 #ansible_ssh_private_key_file={{ pathToKey }}
 #ansible_user={{cent7RemoteUser}}
 #ansible_ssh_user={{cent7RemoteUser}}

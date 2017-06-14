@@ -1,3 +1,4 @@
+---
 # tasks file for roles/rhel7-stig-server-scan
 
 - name: transfert NON TAILORING profiles to remote hosts
@@ -29,12 +30,12 @@
   debug:
     var: output.stdout_lines
 
-- name: tranfert report to Ansible Host
-  fetch:
-    src: "{{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanReportName }}"
-    dest: "{{ rhPathToStoreResults }}{{ rhStigServerTailoringProfileScanReportName }}"
+# - name: tranfert report to Ansible Host
+#   fetch:
+#     src: "{{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanReportName }}"
+#     dest: "{{ rhPathToStoreResults }}{{ rhStigServerTailoringProfileScanReportName }}"
 
-- name: tranfert results to Ansible Host
-  fetch:
-    src: "{{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanResultName }}"
-    dest: "{{ rhPathToStoreResults }}{{ rhStigServerTailoringProfileScanResultName }}"
+# - name: tranfert results to Ansible Host
+#   fetch:
+#     src: "{{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanResultName }}"
+#     dest: "{{ rhPathToStoreResults }}{{ rhStigServerTailoringProfileScanResultName }}"
