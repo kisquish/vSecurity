@@ -7,11 +7,13 @@
   service:
     name: auditd
     enabled: yes
+  ignore_errors: yes
 
 - name: start auditd Service
   service:
     name: auditd
     state: started
+  ignore_errors: yes
 
 - name: start remediation block
   lineinfile:
@@ -47,42 +49,49 @@
     state: present
     backup: yes
 
-# - name: ENSURE AIDE is installed
-#   yum:
-#     name: "{{item}}"
-#     state: present
-#   with_items:
-#     - aide
-#   register: aidePresence
+- name: ENSURE AIDE is installed
+  yum:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - aide
+  register: aidePresence
+  ignore_errors: yes
 
-# - name: Build and Test AIDE Database --> Generate the new Database
-#   command: /usr/sbin/aide --init
-#   register: aideInit
-#   when: aidePresence.changed
+- name: Build and Test AIDE Database --> Generate the new Database
+  command: /usr/sbin/aide --init
+  register: aideInit
+  when: aidePresence.changed
+  ignore_errors: yes
 
-# - name: AIDE Database Generation status
-#   debug:
-#     var: aideInit.stdout_lines
+- name: AIDE Database Generation status
+  debug:
+    var: aideInit.stdout_lines
+  ignore_errors: yes
 
-# - name: Build an Test AIDE Database --> Install newly Generated Database
-#   command: cp -p /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
-#   when: aideInit.changed
+- name: Build an Test AIDE Database --> Install newly Generated Database
+  command: cp -p /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+  when: aideInit.changed
+  ignore_errors: yes
 
-# - name: check AIDE Database
-#   command: /usr/sbin/aide --check
-#   register: aideCheck
-#   when: aideInit.changed
+- name: check AIDE Database
+  command: /usr/sbin/aide --check
+  register: aideCheck
+  when: aideInit.changed
+  ignore_errors: yes
 
-# - name: AIDE Database check statut
-#   debug:
-#     var: aideCheck.stdout_lines
+- name: AIDE Database check statut
+  debug:
+    var: aideCheck.stdout_lines
+  ignore_errors: yes
 
-# - name: Configure Periodic Execution of AIDE - implement a weekly Execution of AIDE at 4 05 AM using cron
-#   lineinfile:
-#     path: /etc/crontab
-#     line: '05 4 * * * root /usr/sbin/aide --check'
-#   ignore_erros: yes
-#   when: aideInit.changed
+- name: Configure Periodic Execution of AIDE - implement a weekly Execution of AIDE at 4 05 AM using cron
+  lineinfile:
+    path: /etc/crontab
+    line: '05 4 * * * root /usr/sbin/aide --check'
+  ignore_errors: yes
+  when: aideInit.changed
+  ignore_errors: yes
 
 - name: "Verify and Correct File Permissions with RPM --> Read list of files with incorrect permissions"
   shell: "rpm -Va | grep '^.M' | sed -r 's;^.*\\s+(.+);\\1;g'"
@@ -491,7 +500,7 @@
     state=present
   with_items:
     - tcp_wrappers
-#  ignore_erros: yes
+  ignore_errors: yes
 
 - name: Disable service kdump
   service:
