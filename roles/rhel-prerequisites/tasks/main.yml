@@ -1,5 +1,9 @@
 ---
 # tasks file for roles/rhel-prerequisites
+
+- name: update the kernel
+  command: yum -y update
+
 - name: make sure some packages are installed
   yum:
     name: "{{ item }}"
