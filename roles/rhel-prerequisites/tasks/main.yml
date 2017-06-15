@@ -5,6 +5,7 @@
     name: "{{ item }}"
   with_items:
     - curl
+    - libselinux-python
 
 # - name: installing cloudwatch --> 
 #   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O

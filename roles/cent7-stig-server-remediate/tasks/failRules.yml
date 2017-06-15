@@ -47,35 +47,35 @@
     state: present
     backup: yes
 
-- name: ENSURE AIDE is installed
-  yum:
-    name: "{{item}}"
-    state: present
-  with_items:
-    - aide
-  register: aidePresence
+# - name: ENSURE AIDE is installed
+#   yum:
+#     name: "{{item}}"
+#     state: present
+#   with_items:
+#     - aide
+#   register: aidePresence
 
-- name: Build and Test AIDE Database --> Generate the new Database
-  command: /usr/sbin/aide --init
-  register: aideInit
-  when: aidePresence.changed
+# - name: Build and Test AIDE Database --> Generate the new Database
+#   command: /usr/sbin/aide --init
+#   register: aideInit
+#   when: aidePresence.changed
 
-- name: AIDE Database Generation status
-  debug:
-    var: aideInit.stdout_lines
+# - name: AIDE Database Generation status
+#   debug:
+#     var: aideInit.stdout_lines
 
-- name: Build an Test AIDE Database --> Install newly Generated Database
-  command: cp -p /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
-  when: aideInit.changed
+# - name: Build an Test AIDE Database --> Install newly Generated Database
+#   command: cp -p /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+#   when: aideInit.changed
 
-- name: check AIDE Database
-  command: /usr/sbin/aide --check
-  register: aideCheck
-  when: aideInit.changed
+# - name: check AIDE Database
+#   command: /usr/sbin/aide --check
+#   register: aideCheck
+#   when: aideInit.changed
 
-- name: AIDE Database check statut
-  debug:
-    var: aideCheck.stdout_lines
+# - name: AIDE Database check statut
+#   debug:
+#     var: aideCheck.stdout_lines
 
 # - name: Configure Periodic Execution of AIDE - implement a weekly Execution of AIDE at 4 05 AM using cron
 #   lineinfile:
