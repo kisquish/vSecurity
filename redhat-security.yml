@@ -1,0 +1,3 @@
+- hosts: redhat
+  roles:
+    - rhel7-security-patch

@@ -1,0 +1,3 @@
+- hosts: centos
+  roles:
+    - cent7-security-patch

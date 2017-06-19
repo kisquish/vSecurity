@@ -3,8 +3,7 @@
 # group of redhat servers
 [rhel7-server]
 ec2-34-253-69-75.eu-west-1.compute.amazonaws.com
-ec2-54-229-237-171.eu-west-1.compute.amazonaws.com
-ec2-54-229-203-198.eu-west-1.compute.amazonaws.com
+ec2-34-249-212-152.eu-west-1.compute.amazonaws.com
 
 # group of centOS servers
 [cent7-server]
