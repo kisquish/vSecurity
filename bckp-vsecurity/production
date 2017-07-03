@@ -1,0 +1,20 @@
+# inventory file for production 
+
+# group of redhat servers
+#[tag_AnsibleManagement_Target_RedHat]
+#[redhat]
+#ec2-34-249-212-152.eu-west-1.compute.amazonaws.com
+#ec2-34-249-168-134.eu-west-1.compute.amazonaws.com
+
+# group of centOS servers
+#[tag_AnsibleManagement_Target_CentOS]
+[centos]
+ec2-34-249-16-137.eu-west-1.compute.amazonaws.com
+ec2-54-76-209-254.eu-west-1.compute.amazonaws.com
+ec2-52-215-43-94.eu-west-1.compute.amazonaws.com
+ec2-52-213-97-208.eu-west-1.compute.amazonaws.com
+ec2-54-77-44-40.eu-west-1.compute.amazonaws.com
+
+[centos:vars]
+executionDay = "Friday"
+executionHour = "16"

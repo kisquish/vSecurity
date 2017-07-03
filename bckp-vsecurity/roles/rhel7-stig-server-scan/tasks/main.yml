@@ -1,0 +1,41 @@
+---
+# tasks file for roles/rhel7-stig-server-scan
+
+- name: transfert NON TAILORING profiles to remote hosts
+  copy:
+    src: ssg-rhel7-ds.xml
+    dest: "{{ rhRemoteScapDirectory }}ssg-rhel7-ds.xml"
+    mode: "u=rw,g=r,o=r"
+
+- name: transfert TAILORING profiles to remote hosts
+  copy:
+    src: ssg-rhel7-ds-tailoring.xml
+    dest: "{{ rhRemoteScapDirectory }}ssg-rhel7-ds-tailoring.xml"
+    mode: "u=rw,g=r,o=r"
+
+- name: Get Information SCAP Content from STIG SERVER profile
+  command: oscap info {{ rhRemoteScapDirectory }}ssg-rhel7-ds.xml
+  register: result
+
+- name: Displaying Lists of profiles from STIG SERVER profile
+  debug:
+    var: result.stdout_lines
+
+- name: SCAN The system to evaluate STIG SERVER TAILORING Profile
+  command: oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_stig-rhel7-disa_customized --results-arf {{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanResultName }} --report {{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanReportName }} --tailoring-file {{ rhRemoteScapDirectory }}ssg-rhel7-ds-tailoring.xml {{ rhRemoteScapDirectory }}ssg-rhel7-ds.xml
+  register: output
+  ignore_errors: yes
+
+- name: Displaying scanning output
+  debug:
+    var: output.stdout_lines
+
+# - name: tranfert report to Ansible Host
+#   fetch:
+#     src: "{{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanReportName }}"
+#     dest: "{{ rhPathToStoreResults }}{{ rhStigServerTailoringProfileScanReportName }}"
+
+# - name: tranfert results to Ansible Host
+#   fetch:
+#     src: "{{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanResultName }}"
+#     dest: "{{ rhPathToStoreResults }}{{ rhStigServerTailoringProfileScanResultName }}"

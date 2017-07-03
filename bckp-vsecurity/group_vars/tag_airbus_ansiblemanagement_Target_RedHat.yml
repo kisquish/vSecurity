@@ -1,0 +1,5 @@
+rhRemoteUser: ec2-user
+ansible_user: "{{rhRemoteUser}}"
+ansible_ssh_user: "{{rhRemoteUser}}"
+become_method: sudo
+ansible_become: True

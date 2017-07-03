@@ -1,0 +1,254 @@
+########################
+- name: install packages
+  yum:
+    name: audit
+    state: present
+
+- name: Enable auditd Service
+  service:
+    name: auditd
+    enabled: yes
+  ignore_errors: yes
+
+- name: start auditd Service
+  service:
+    name: auditd
+    state: started
+  ignore_errors: yes
+    
+- name: Ensure gpgcheck Enabled In Main Yum Configuration
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^gpgcheck='
+    line: 'gpgcheck=1'
+    state: present
+    backup: yes
+
+- name: "Verify File Hashes with RPM --> Set fact: Package manager reinstall command (dnf)"
+  set_fact:
+    package_manager_reinstall_cmd: dnf reinstall -y
+  when: ansible_distribution == "Fedora"
+
+- name: "Verify File Hashes with RPM --> Set fact: Package manager reinstall command (yum)"
+  set_fact:
+    package_manager_reinstall_cmd: yum reinstall -y
+  when: ansible_distribution == "RedHat"
+
+- name: "Verify File Hashes with RPM --> Read files with incorrect hash"
+  shell: "rpm -Va | grep -E '^..5.* /(bin|sbin|lib|lib64|usr)/' | sed -r 's;^.*\\s+(.+);\\1;g'"
+  register: files_with_incorrect_hash
+  changed_when: False
+  when: package_manager_reinstall_cmd is defined
+
+- name: "Verify File Hashes with RPM --> Reinstall packages of files with incorrect hash"
+  shell: "{{package_manager_reinstall_cmd}} $(rpm -qf '{{item}}')"
+  with_items: "{{ files_with_incorrect_hash.stdout_lines }}"
+  when: package_manager_reinstall_cmd is defined and (files_with_incorrect_hash.stdout_lines | length > 0)
+
+
+- name: Disable Prelinking
+  lineinfile:
+    create: yes
+    path: /etc/sysconfig/prelinking
+    line: 'PRELINKING=no' 
+
+# - name: Disable the Automounter
+#   command: systemctl disable autofs
+
+# - name: Install PAE Kernel on Supported 32-bit x86 Systems
+#   yum:
+#     name: kernel-PAE
+#     state: present
+
+- name: Ensure SELinux Not Disabled in /etc/default/grub
+  lineinfile:
+    path: /etc/default/grub
+    line: 'selinux=0'
+    state: absent
+
+- name: Configure SELinux Policy
+  lineinfile:
+    path: /etc/selinux/config
+    line: 'SELINUXTYPE=targeted'
+    state: present
+
+- name: Verify /boot/grub2/grub.cfg User Ownership
+  command: chown root /boot/grub2/grub.cfg
+
+- name: Verify /boot/grub2/grub.cfg Group Ownership
+  command: chgrp root /boot/grub2/grub.cfg
+
+- name: Configure Kernel Parameter for Accepting Source-Routed Packets for All Interfaces
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.all.accept_source_route = 0'
+    state: present
+
+- name: Configure Kernel Parameter for Accepting Source-Routed Packets By Default
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.default.accept_source_route = 0'
+    state: present
+
+- name: Disable Zeroconf Networking
+  lineinfile:
+    path: /etc/sysconfig/network
+    line: 'NOZEROCONF=yes'
+
+- name: Configure auditd mail_acct Action on Low Disk Space
+  lineinfile:
+    create: yes
+    path: /etc/audit/auditd.conf
+    line: 'action_mail_acct = root'
+
+# - name: Disable xinetd service 
+#   service:
+#     name: xinetd
+#     enabled: no
+
+- name: Uninstall xinetd Package
+  yum:
+    name: xinetd
+    state: absent
+
+- name: Uninstall telnet-server Package
+  yum:
+    name: telnet-server
+    state: absent
+
+- name: Remove telnet Clients
+  yum:
+    name: telnet
+    state: absent
+
+- name: Uninstall rsh-server Package
+  yum:
+    name: rsh-server
+    state: absent
+
+- name: Uninstall rsh package
+  yum:
+    name: rsh
+    state: absent
+
+- name: Uninstall ypserv package
+  yum:
+    name: ypserv
+    state: absent
+
+- name: Remove NIS Clients
+  yum:
+    name: ypbind
+    state: absent
+
+- name: Uninstall tftp-server Package
+  yum:
+    name: tftp-server
+    state: absent
+
+- name: Remove tftp Daemon
+  yum:
+    name: tftp
+    state: absent
+
+- name: Uninstall talk-server Package
+  yum:
+    name: talk-server
+    state: absent
+
+- name: Uninstall talk Package
+  yum:
+    name: talk
+    state: absent
+
+# - name: Verify User Who Owns /etc/cron.allow file
+#   file:
+#     path: /etc/cron.allow
+#     owner: root
+
+# - name: Enable cron Service
+#   service:
+#     name: crond
+#     enabled: yes
+
+- name: Disable anacron Service
+  yum:
+    name: cronie-anacron
+    state: absent
+
+- name: Disable SSH Support for .rhosts Files
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#IgnoreRhosts'
+    line: 'IgnoreRhosts yes'
+
+- name: Disable Host-Based Authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#HostbasedAuthentication'
+    line: 'HostbasedAuthentication no'
+
+- name: Enable Encrypted X11 Forwarding
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^X11Forwarding'
+    line: 'X11Forwarding yes'
+
+- name: Install the OpenSSH Server Package
+  yum:
+    name: openssh-server
+    state: present
+
+- name: Enable the OpenSSH Service
+  service:
+    name: sshd
+    enabled: yes
+
+# - name: Verify Permissions on SSH Server Public *.pub Key Files
+#   command: chmod 0400 /etc/ssh/{{item}}
+#   with_items:
+#     - ssh_host_ecdsa_key.pub
+#     - ssh_host_ed25519_key.pub
+#     - ssh_host_rsa_key.pub
+# #  command: chmod 0644 /etc/ssh/*.pub
+
+# - name: Verify Permissions on SSH Server Private *_key Key Files
+# #  command: chmod 0644 /etc/ssh/*_pub
+#   command: chmod 0400 /etc/ssh/{{item}}
+#   with_items:
+#     - ssh_host_ecdsa_key
+#     - ssh_host_ed25519_key
+#     - ssh_host_rsa_key
+
+- name: Disable X Windows Startup By Setting Default Target
+  command: systemctl set-default multi-user.target
+
+- name: Uninstall DHCP Server Package
+  yum:
+    name: dhcp
+    state: absent
+
+- name: Uninstall Sendmail package
+  yum:
+    name: sendmail
+    state: absent
+
+- name: Uninstall bind package
+  yum:
+    name: bind
+    state: absent
+
+- name: Uninstall vsftp package
+  yum:
+    name: vsftp
+    state: absent
+
+- name: Uninstall dovecot package
+  yum:
+    name: dovecot
+    state: absent
+
+- name: Uninstall net-snmp package
+  yum:
+    name: net-snmp
+    state: absent

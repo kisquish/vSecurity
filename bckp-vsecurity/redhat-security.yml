@@ -1,0 +1,4 @@
+- hosts: tag_airbus_ansiblemanagement_Target_RedHat
+  user: ec2-user
+  roles:
+    - rhel7-security-patch

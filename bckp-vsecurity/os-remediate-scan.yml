@@ -1,0 +1,18 @@
+- hosts: tag_airbus_ansiblemanagement_Target_RedHat
+  user: ec2-user
+  roles:
+    - rhel-prerequisites
+    - rhel7-stig-server-scan
+    - rhel7-stig-server-remediate
+    - rhel7-stig-server-scan
+
+- hosts: tag_airbus_ansiblemanagement_Target_CentOS
+  user: centos
+  roles:
+    - cent-prerequisites
+    - cent7-stig-server-remediate
+
+# - hosts: tag_airbus_ansiblemanagement_Target_RedHat
+#   user: ec2-user
+#   roles:
+#     - rhel7-stig-server-scan
