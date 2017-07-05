@@ -1,4 +1,10 @@
-- hosts: tag_airbus_ansiblemanagement_Target_RedHat
+# - hosts: tag_airbus_ansiblemanagement_Target_RedHat
+#   user: ec2-user
+#   roles:
+#     - rhel7-security-patch
+
+- name: test
+  hosts: tag_airbus_ansiblemanagement_Target_RedHat
   user: ec2-user
   roles:
-    - rhel7-security-patch
+    - { role: rhel7-security-patch, when: executionHour is defined and executionDay is defined and executionHour == ansible_date_time.hour and executionDay == ansible_date_time.weekday }

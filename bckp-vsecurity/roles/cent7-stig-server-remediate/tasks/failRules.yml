@@ -493,7 +493,7 @@
     state=present
   with_items:
     - libreswan
-#  ignore_errors: yes
+  ignore_errors: yes
 
 - name: Install tcp_wrappers Package Ensure 
   yum:

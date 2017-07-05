@@ -1,0 +1,45 @@
+---
+# tasks file for roles/rhel-prerequisites
+
+# - name: enable redhat official repos
+#   lineinfile:
+#     path: "{{item}}"
+#     regexp: 'enabled=0'
+#     line: 'enabled=1'
+#     state: present
+#   with_items:
+#     - /etc/yum.repos.d/redhat-rhui.repo
+#     - /etc/yum.repos.d/redhat-rhui-client-config.repo
+
+- name: make sure some packages are installed
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - curl
+    - libselinux-python
+
+# - name: installing cloudwatch --> 
+#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
+
+# - name: installing cloudwatch
+#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
+
+# - name: installing cloudwatch
+#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
+
+# - name: installing cloudwatch
+#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
+
+- name: installing OpenSCAP packages
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - openscap-scanner
+    - scap-security-guide
+    - scap-workbench
+
+- name: create directory to store results & reports
+  file:
+    path: "{{ rhRemoteScapDirectory }}"
+    state: directory
+    mode: 0755
