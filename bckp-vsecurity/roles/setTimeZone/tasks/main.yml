@@ -1,0 +1,6 @@
+---
+# tasks file for roles/setTimeZone
+
+- name: set timezone to Paris time
+  timezone:
+    name: Europe/Paris

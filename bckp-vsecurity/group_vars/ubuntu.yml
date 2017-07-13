@@ -1,0 +1,6 @@
+ubRemoteUser: ubuntu
+ansible_user: "{{ubRemoteUser}}"
+ansible_ssh_user: "{{ubRemoteUser}}"
+ansible_python_interpreter: /usr/bin/python3
+become_method: sudo
+ansible_become: True

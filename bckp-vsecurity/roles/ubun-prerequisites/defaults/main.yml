@@ -7,8 +7,8 @@
 # pathToKey: /home/ec2-user/.ssh/a-scap.pem
 # on remote hosts
 # rhel
-rhRemoteUser: ec2-user
-rhRemoteScapDirectory: "/home/{{rhRemoteUser}}/scap/"
+ubRemoteUser: ubuntu
+ubRemoteScapDirectory: "/home/{{ubRemoteUser}}/scap/"
 # rhPathToGetProfiles: /usr/share/xml/scap/ssg/content/
 # rhelNode1Host: 10.12.0.36
 

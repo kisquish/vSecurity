@@ -5,9 +5,11 @@
   roles:
     - rhel-prerequisites
     - rhel7-stig-server-remediate
+    - setTimeZone
 
 - hosts: tag_airbus_ansiblemanagement_Target_CentOS #si ne marche pas, tester airbus_ansiblemanagement_Target_CentOS au lieu de tag_airbus_ansiblemanagement_Target_CentOS
   user: centos
   roles:
     - cent-prerequisites
     - cent7-stig-server-remediate
+    - setTimeZone
