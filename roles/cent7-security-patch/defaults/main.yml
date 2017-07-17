@@ -1,2 +1,4 @@
 ---
 # defaults file for roles/cent7-security-patch
+# executionDay: "Thursday"
+# executionHour: "08"

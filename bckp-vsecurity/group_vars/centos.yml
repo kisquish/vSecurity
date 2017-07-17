@@ -1,9 +1,0 @@
-cent7RemoteUser: centos
-ansible_user: "{{cent7RemoteUser}}"
-ansible_ssh_user: "{{cent7RemoteUser}}"
-become_method: sudo
-ansible_become: True
-
-#executionDay: "Thursday"
-#executionHour: "08"
-#executionTimezone: UTC

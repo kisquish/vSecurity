@@ -8,11 +8,13 @@
   service:
     name: auditd
     enabled: yes
+  ignore_errors: yes
 
 - name: start auditd Service
   service:
     name: auditd
     state: started
+  ignore_errors: yes
     
 - name: Ensure gpgcheck Enabled In Main Yum Configuration
   lineinfile:

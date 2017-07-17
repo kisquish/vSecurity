@@ -7,5 +7,8 @@
   with_items:
     - yum-plugin-security
 
+- name: add securty repo
+  command: yum-config-manager --add-repo rhui2-cds01.eu-west-1.aws.ce.redhat.com rhui2-cds02.eu-west-1.aws.ce.redhat.com
+
 - name: update securty
-  command: yum --security update
+  command: yum -y --security update

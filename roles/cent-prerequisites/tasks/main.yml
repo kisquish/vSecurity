@@ -1,8 +1,6 @@
 ---
 # tasks file for roles/cent-prerequisites
-- name: update the kernel
-  command: yum -y update
-  
+ 
 - name: make sure some packages are installed
   yum:
     name: "{{ item }}"
@@ -22,13 +20,13 @@
 # - name: installing cloudwatch
 #   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 
-- name: installing OpenSCAP packages
-  yum:
-    name: "{{ item }}"
-  with_items:
-    - openscap-scanner
-    - scap-security-guide
-    - scap-workbench
+# - name: installing OpenSCAP packages
+#   yum:
+#     name: "{{ item }}"
+#   with_items:
+#     - openscap-scanner
+#     - scap-security-guide
+#     - scap-workbench
 
 - name: create directory to store results & reports
   file:

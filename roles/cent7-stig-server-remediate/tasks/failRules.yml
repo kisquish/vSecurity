@@ -1,19 +1,19 @@
-- name: install packages
-  yum:
-    name: audit
-    state: present
+# - name: install packages
+#   yum:
+#     name: audit
+#     state: present
 
-- name: Enable auditd Service
-  service:
-    name: auditd
-    enabled: yes
-  ignore_errors: yes
+# - name: Enable auditd Service
+#   service:
+#     name: auditd
+#     enabled: yes
+#   ignore_errors: yes
 
-- name: start auditd Service
-  service:
-    name: auditd
-    state: started
-  ignore_errors: yes
+# - name: start auditd Service
+#   service:
+#     name: auditd
+#     state: started
+#   ignore_errors: yes
 
 - name: start remediation block
   lineinfile:
@@ -493,6 +493,7 @@
     state=present
   with_items:
     - libreswan
+  ignore_errors: yes
 
 - name: Install tcp_wrappers Package Ensure 
   yum:

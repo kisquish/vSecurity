@@ -1,7 +1,8 @@
 ---
 # tasks file for roles/rhel-prerequisites
-- name: update the kernel
-  command: yum -y update
+
+# - name: set timezone to UTC
+#     name: utc
 
 - name: make sure some packages are installed
   yum:
@@ -9,18 +10,6 @@
   with_items:
     - curl
     - libselinux-python
-
-# - name: installing cloudwatch --> 
-#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-
-# - name: installing cloudwatch
-#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-
-# - name: installing cloudwatch
-#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-
-# - name: installing cloudwatch
-#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 
 - name: installing OpenSCAP packages
   yum:

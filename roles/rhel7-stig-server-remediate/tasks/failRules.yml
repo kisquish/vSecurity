@@ -7,11 +7,13 @@
   service:
     name: auditd
     enabled: yes
+  ignore_errors: yes
 
 - name: start auditd Service
   service:
     name: auditd
     state: started
+  ignore_errors: yes
 
 - name: start remediation block
   lineinfile:
@@ -484,6 +486,7 @@
     state=present
   with_items:
     - libreswan
+  ignore_errors: yes
 
 - name: Install tcp_wrappers Package Ensure 
   yum:
@@ -491,7 +494,7 @@
     state=present
   with_items:
     - tcp_wrappers
-#  ignore_erros: yes
+  ignore_errors: yes
 
 - name: Disable service kdump
   service:
