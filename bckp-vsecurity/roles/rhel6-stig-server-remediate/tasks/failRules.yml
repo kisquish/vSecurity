@@ -1,0 +1,621 @@
+- name: install packages
+  yum:
+    name: audit
+    state: present
+
+- name: Enable auditd Service
+  service:
+    name: auditd
+    enabled: yes
+  ignore_errors: yes
+
+- name: start auditd Service
+  service:
+    name: auditd
+    state: started
+  ignore_errors: yes
+
+- name: start remediation block
+  lineinfile:
+    path: /etc/yum.conf
+    insertafter: '^installonly_limit=3'
+    line: '# REMEDIATION BLOCK'
+    state: present
+
+- name: Ensure YUM Removes Previous Package Versions
+  lineinfile:
+    path: /etc/yum.conf
+    insertafter: '^# REMEDIATION BLOCK'
+    regexp: '^clean_requirements_on_remove='
+    line: 'clean_requirements_on_remove=1'
+    state: present
+    backup: yes
+
+- name: Ensure gpgcheck Enabled for Local Packages
+  lineinfile:
+    path: /etc/yum.conf
+    insertafter: '^# REMEDIATION BLOCK'
+    regexp: '^localpkg_gpgcheck='
+    line: 'localpkg_gpgcheck=1'
+    state: present
+    backup: yes
+
+- name: Ensure gpgcheck Enabled for Repository Metadata
+  lineinfile:
+    path: /etc/yum.conf
+    insertafter: '^# REMEDIATION BLOCK'
+    regexp: '^repo_gpgcheck='
+    line: 'repo_gpgcheck=1'
+    state: present
+    backup: yes
+
+- name: ENSURE AIDE is installed
+  yum:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - aide
+  register: aidePresence
+
+- name: Build and Test AIDE Database --> Generate the new Database
+  command: /usr/sbin/aide --init
+  register: aideInit
+  when: aidePresence.changed
+
+- name: AIDE Database Generation status
+  debug:
+    var: aideInit.stdout_lines
+
+- name: Build an Test AIDE Database --> Install newly Generated Database
+  command: cp -p /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+  when: aideInit.changed
+
+- name: check AIDE Database
+  command: /usr/sbin/aide --check
+  register: aideCheck
+  when: aideInit.changed
+
+- name: AIDE Database check statut
+  debug:
+    var: aideCheck.stdout_lines
+
+# - name: Configure Periodic Execution of AIDE - implement a weekly Execution of AIDE at 4 05 AM using cron
+#   lineinfile:
+#     path: /etc/crontab
+#     line: '05 4 * * * root /usr/sbin/aide --check'
+#   ignore_erros: yes
+#   when: aideInit.changed
+
+- name: "Verify and Correct File Permissions with RPM --> Read list of files with incorrect permissions"
+  shell: "rpm -Va | grep '^.M' | sed -r 's;^.*\\s+(.+);\\1;g'"
+  register: files_with_incorrect_permissions
+  failed_when: False
+  changed_when: False
+
+- name: "Verify and Correct File Permissions with RPM --> Correct file permissions with RPM"
+  shell: "rpm --setperms $(rpm -qf '{{item}}')"
+  with_items: "{{ files_with_incorrect_permissions.stdout_lines }}"
+  when: files_with_incorrect_permissions.stdout_lines | length > 0
+
+- name: start remediation block
+  lineinfile:
+    path: /etc/fstab
+    line: '# REMEDIATION BLOCK'
+    state: present
+    backup: yes
+
+# - name: Add noexec Option to /dev/shm
+#   lineinfile:
+#     path: /etc/fstab
+#     insertafter: '^# REMEDIATION BLOCK'
+#     regexp: '^tmpfs   /dev/shm'
+#     line: 'tmpfs  /dev/shm            tmpfs defaults,noexec     0 0'
+#     state: present
+
+- name: Ensure kernel module 'usb-storage' is disabled
+  lineinfile:
+    create=yes
+    dest="/etc/modprobe.d/{{item}}.conf"
+    regexp="{{item}}"
+    line="install {{item}} /bin/true"
+  with_items:
+    - usb-storage
+
+- name: start remediation block
+  lineinfile:
+    path: /etc/default/grub
+    line: '# REMEDIATION BLOCK'
+    state: present
+
+- name: Disable Kernel Support for USB via Bootloader Configuration
+  script: disableKernelSupportUSBviaBootloaderConfiguration.sh
+
+- name: Ensure kernel module 'cramfs' is disabled
+  lineinfile:
+    create=yes
+    dest="/etc/modprobe.d/{{item}}.conf"
+    regexp="{{item}}"
+    line="install {{item}} /bin/true"
+  with_items:
+    - cramfs
+
+- name: Ensure kernel module 'freevxfs' is disabled
+  lineinfile:
+    create=yes
+    dest="/etc/modprobe.d/{{item}}.conf"
+    regexp="{{item}}"
+    line="install {{item}} /bin/true"
+  with_items:
+    - freevxfs
+
+- name: Ensure kernel module 'jffs2' is disabled
+  lineinfile:
+    create=yes
+    dest="/etc/modprobe.d/{{item}}.conf"
+    regexp="{{item}}"
+    line="install {{item}} /bin/true"
+  with_items:
+    - jffs2
+
+- name: Ensure kernel module 'hfs' is disabled
+  lineinfile:
+    create=yes
+    dest="/etc/modprobe.d/{{item}}.conf"
+    regexp="{{item}}"
+    line="install {{item}} /bin/true"
+  with_items:
+    - hfs
+
+- name: Ensure kernel module 'hfsplus' is disabled
+  lineinfile:
+    create=yes
+    dest="/etc/modprobe.d/{{item}}.conf"
+    regexp="{{item}}"
+    line="install {{item}} /bin/true"
+  with_items:
+    - hfsplus
+
+
+- name: Ensure kernel module 'squashfs' is disabled
+  lineinfile:
+    create=yes
+    dest="/etc/modprobe.d/{{item}}.conf"
+    regexp="{{item}}"
+    line="install {{item}} /bin/true"
+  with_items:
+    - squashfs
+
+- name: Ensure kernel module 'udf' is disabled
+  lineinfile:
+    create=yes
+    dest="/etc/modprobe.d/{{item}}.conf"
+    regexp="{{item}}"
+    line="install {{item}} /bin/true"
+  with_items:
+    - udf
+
+- name: Disable Core Dumps for SUID programs
+  script: disableCoreDumps4SUIDprograms.sh
+
+- name: Enable Randomized Layout of Virtual Address Space
+  script: enableRandomizedLayoutofVirtualAdressSpace.sh
+
+- name: Ensure No Device Files are Unlabeled by SELinux
+  script: ensureNoDeviceFilesAreUnlabeledBySELinux.sh
+
+- name: "Prevent Log In to Accounts With Empty Password"
+  replace:
+    dest: /etc/pam.d/system-auth
+    regexp: 'nullok\s*'
+    replace: ''
+
+- name: Set Password Minimum Age
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MIN_DAYS'
+    line: 'PASS_MIN_DAYS    1'
+    state: present
+    backup: yes  
+
+- name: Set Password Maximum Age
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MAX_DAYS'
+    line: 'PASS_MAX_DAYS   60'
+    state: present
+
+- name: "Set Account Expiration Following Inactivity"
+  lineinfile:
+    create=yes
+    dest="/etc/default/useradd"
+    regexp="^INACTIVE"
+    line="INACTIVE=0"
+
+
+- name: Set Password Maximum Consecutive Repeating Characters
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^# maxrepeat ='
+    line: 'maxrepeat = 2'
+    state: present
+    backup: yes 
+
+- name: Set Password to Maximum of Consecutive Repeating Characters from Same Character Class
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^# maxclassrepeat ='
+    line: 'maxclassrepeat = 0'
+    state: present
+    backup: yes 
+
+- name: Set Password Strength Minimum Digit Characters
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^# dcredit'
+    line: 'dcredit = -1'
+    state: present
+
+# - name: Set Password Minimum Length
+#   lineinfile:
+#     path: /etc/security/pwquality.conf
+#     regexp: '^# minlen'
+#     line: 'minlen = 15'
+#     state: present
+
+- name: Set Password Strength Minimum Uppercase Characters
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^# ucredit = '
+    line: 'ucredit = -1'
+    state: present
+
+- name: Set Password Strength Minimum Special Characters
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^# ocredit = '
+    line: 'ocredit = -1'
+    state: present
+
+- name: Set Password Strength Minimum Lowercase Characters
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^# lcredit = '
+    line: 'lcredit = -6'
+    state: present
+
+# - name: Set Password Strength Minimum Different Characters
+#   lineinfile:
+#     path: /etc/security/pwquality.conf
+#     regexp: '^# difok'
+#     line: 'difok = 8'
+#     state: present
+
+- name: Set Password Strength Minimum Different Categories
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^# minclass = '
+    line: 'minclass = 4'
+    state: present
+    backup: yes
+
+
+- name: Set Deny For Failed Password Attempts -->  required pam_faillock in auth section in system-auth
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    insertbefore: '^auth        sufficient    pam_unix.so nullok try_first_pass'
+    line: 'auth required pam_faillock.so preauth silent deny=3 unlock_time=never fail_interval=900'
+    state: present
+    backup: yes
+
+- name: Set Deny For Failed Password Attempts --> required pam_faillock in auth section in password-auth
+  lineinfile:
+    path: /etc/pam.d/password-auth
+    insertbefore: '^auth        sufficient    pam_unix.so nullok try_first_pass'
+    line: 'auth required pam_faillock.so preauth silent deny=3 unlock_time=never fail_interval=900'
+    state: present
+    backup: yes
+
+- name: Set Deny For Failed Password Attempts -->  required default in auth section in system-auth
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    insertafter: '^auth        sufficient    pam_unix.so nullok try_first_pass'
+    line: 'auth [default=die] pam_faillock.so authfail deny=3 unlock_time=never fail_interval=900'
+    state: present
+
+- name: Set Deny For Failed Password Attempts --> required default in auth section in password-auth
+  lineinfile:
+    path: /etc/pam.d/password-auth
+    insertafter: '^auth        sufficient    pam_unix.so nullok try_first_pass'
+    line: 'auth [default=die] pam_faillock.so authfail deny=3 unlock_time=never fail_interval=900'
+    state: present
+
+- name: Set Deny For Failed Password Attempts -->  required account in account section in system-auth
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    insertbefore: '^account     required      pam_unix.so'
+    line: 'account required pam_faillock.so'
+    state: present
+
+- name: Set Deny For Failed Password Attempts --> required account in account section in password-auth
+  lineinfile:
+    path: /etc/pam.d/password-auth
+    insertbefore: '^account     required      pam_unix.so'
+    line: 'account required pam_faillock.so'
+    state: present
+
+- name: Set Lockout Time For Failed Password Attempts -->  required pam_faillock including even_deny_root in auth section in system-auth
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    insertbefore: '^auth        required      pam_deny.so'
+    line: 'auth required pam_faillock.so preauth silent even_deny_root deny=3 unlock_time=never fail_interval=900'
+    state: present
+
+- name: Set Lockout Time For Failed Password Attempts --> required pam_faillock including even_deny_root in auth section in password-auth
+  lineinfile:
+    path: /etc/pam.d/password-auth
+    insertbefore: '^auth        required      pam_deny.so'
+    line: 'auth required pam_faillock.so preauth silent even_deny_root deny=3 unlock_time=never fail_interval=900'
+    state: present
+
+- name: Set Lockout Time For Failed Password Attempts -->  required default in auth section including even_deny_root in system-auth
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    insertafter: '^auth        sufficient    pam_unix.so nullok try_first_pass'
+    line: 'auth [default=die] pam_faillock.so authfail even_deny_root deny=3 unlock_time=never fail_interval=900'
+    state: present
+
+- name: Set Lockout Time For Failed Password Attempts --> required default in auth section including even_deny_root in password-auth
+  lineinfile:
+    path: /etc/pam.d/password-auth
+    insertafter: '^auth        sufficient    pam_unix.so nullok try_first_pass'
+    line: 'auth [default=die] pam_faillock.so authfail even_deny_root deny=3 unlock_time=never fail_interval=900'
+    state: present
+
+- name: Limit Password Reuse
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    insertafter: '^password    sufficient    pam_unix.so sha512 shadow  try_first_pass use_authtok'
+    line: 'password sufficient pam_unix.so ...existing_options... remember=5'
+    state: present
+    backup: yes
+
+- name: Ensure Home Directories are Created for New Users
+  lineinfile:
+    path: /etc/login.defs
+    line: 'CREATE_HOME yes'
+    state: present
+    backup: yes
+
+- name: Set Interactive Session Timeout
+  lineinfile:
+    path: /etc/profile
+    line: 'TMOUT=600'
+    state: present
+    backup: yes
+
+- name: Limit the Number of Concurrent Login Sessions Allowed Per User
+  lineinfile:
+    path: /etc/security/limits.conf
+    insertbefore: '^# End of file'
+    regexp: '^#* hard maxlogins '
+    line: '*     hard    maxlogins    10'
+    state: present
+    backup: yes
+
+- name: Ensure the Logon Failure Delay is Set Correctly in login.defs
+  lineinfile:
+    path: /etc/login.defs
+    line: 'FAIL_DELAY 4'
+    state: present
+
+- name: Verify /boot/grub2/grub.cfg Permissions
+  file:
+    path: /boot/grub2/grub.cfg
+    mode: 0600
+
+- name: Disable Ctrl-Alt-Del Reboot Activation
+  command: systemctl mask ctrl-alt-del.target
+
+- name: Modify the System Login Banner
+  template:
+    src: systemLoginBanner.j2
+    dest: /etc/issue
+    backup: yes
+
+- name: Disable Kernel Parameter for Sending ICMP Redirects by Default
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.default.send_redirects = 0'
+    state: present
+    backup: yes
+
+- name: Disable Kernel Parameter for Sending ICMP Redirects for All Interfaces
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.all.send_redirects = 0'
+    state: present
+
+- name: Disable Kernel Parameter for IP Forwarding
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.ip_forward = 0'
+    state: present
+
+- name: Configure Kernel Parameter for Accepting ICMP Redirects for All Interfaces
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.all.accept_redirects = 0'
+    state: present
+
+- name: Configure Kernel Parameter for Accepting ICMP Redirects By Default
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.default.accept_redirects = 0'
+    state: present
+
+- name: Configure Kernel Parameter to Ignore ICMP Broadcast Echo Requests
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.icmp_echo_ignore_broadcasts = 1'
+    state: present
+
+# - name: Enable service firewalld
+#   service:
+#     name="{{item}}"
+#     enabled="yes"
+#     state="started"
+#   with_items:
+#     - firewalld
+
+# - name: Set Default firewalld Zone for Incoming Packets
+#   lineinfile:
+#     path: /etc/firewalld/firewalld.conf
+#     line: DfaultZone=drop
+#     state: present
+
+- name: Configure auditd space_left Action on Low Disk Space
+  lineinfile:
+    create: yes
+    path: /etc/audit/auditd.conf
+    line: 'space_left_action = ACTION'
+    state: present
+
+- name: Ensure libreswan and tcp_wrappers Package are installed
+  yum:
+    name="{{item}}"
+    state=present
+  with_items:
+    - libreswan
+  ignore_errors: yes
+
+- name: Install tcp_wrappers Package Ensure 
+  yum:
+    name="{{item}}"
+    state=present
+  with_items:
+    - tcp_wrappers
+  ignore_errors: yes
+
+- name: Disable service kdump
+  service:
+    name="{{item}}"
+    enabled="no"
+    state="stopped"
+  with_items:
+    - kdump
+
+- name: Allow Only SSH Protocol 2
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    insertafter: '^# The default requires explicit activation of protocol 1'
+    regexp: '^#Protocol '
+    line: 'Protocol 2'
+    backup: yes
+
+- name: Disable GSSAPI Authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    insertafter: '^# GSSAPI options'
+    regexp: '^GSSAPIAuthentication '
+    line: 'GSSAPIAuthentication no'
+
+- name: Disable Kerberos Authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#KerberosAuthentication no'
+    line: 'KerberosAuthentication no'
+
+- name: Enable Use of Strict Mode Checking
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^UsePrivilegeSeparation '
+    line: 'UsePrivilegeSeparation yes'
+
+- name: Enable Use of Privilege Separation
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#StrictModes yes'
+    line: 'StrictModes yes'
+
+- name: Disable Compression Or Set Compression to delayed
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#Compression delayed'
+    line: 'Compression delayed'
+
+- name: Print Last Log
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#PrintLastLog yes'
+    line: 'PrintLastLog yes'
+
+- name: "SSHD: Set client alive interval"
+  lineinfile:
+    create: yes
+    path: /etc/ssh/sshd_config
+    regexp: '^ClientAliveInterval'
+    line: 'ClientAliveInterval 600'
+
+- name: Set SSH Client Alive Count
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#ClientAliveCountMax 3'
+    line: 'ClientAliveCountMax 0'
+
+- name: Disable SSH Support for User Known Hosts
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#IgnoreUserKnownHosts no'
+    line: 'IgnoreUserKnownHosts yes'
+
+- name: Disable SSH Support for Rhosts RSA Authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#RhostsRSAAuthentication'
+    line: 'RhostsRSAAuthentication no'
+
+
+- name: Disable SSH Root Login
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#PermitRootLogin'
+    line: 'PermitRootLogin no'
+
+- name: "SSHD: Disable empty passwords"
+  lineinfile:
+    create=yes
+    dest="/etc/ssh/sshd_config"
+    regexp="^PermitEmptyPasswords"
+    line="PermitEmptyPasswords no"
+
+- name: "SSHD: Enable warning banner"
+  lineinfile:
+    create=yes
+    dest="/etc/ssh/sshd_config"
+    regexp="^Banner"
+    line="Banner /etc/issue"
+
+- name: "SSHD: Do not permit user environment"
+  lineinfile:
+    create=yes
+    dest="/etc/ssh/sshd_config"
+    regexp="^PermitUserEnvironment"
+    line="PermitUserEnvironment no"
+
+- name: Use Only FIPS 140-2 Validated Ciphers
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    insertafter: '^# Ciphers and keying'
+    line: 'Ciphers aes128-ctr,aes192-ctr,aes256-ctr'
+
+- name: Use Only FIPS 140-2 Validated MACs
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    insertafter: '^# Ciphers and keying'
+    line: 'Ciphers aes128-ctr,aes192-ctr,aes256-ctr'
+
+- name: Use Only FIPS 140-2 Validated MACs
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    insertbefore: '^# Authentication:'
+    line: 'MACs hmac-sha2-512,hmac-sha2-256'

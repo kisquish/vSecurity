@@ -2,9 +2,11 @@
 
 # group of redhat servers
 #[tag_AnsibleManagement_Target_RedHat]
-[redhat]
+[redhat7]
 ec2-34-249-212-152.eu-west-1.compute.amazonaws.com
 ec2-34-249-168-134.eu-west-1.compute.amazonaws.com
+[redhat6]
+ec2-52-16-151-222.eu-west-1.compute.amazonaws.com
 
 # group of centOS servers
 #[tag_AnsibleManagement_Target_CentOS]

@@ -17,10 +17,23 @@
   #roles:
     #- cent7-security-patch
 
-- hosts: redhat
+- hosts: redhat7
   user: ec2-user
   roles:
     - rhel-prerequisites
+    - rhel7-stig-server-scan
+#    - rhel7-stig-server-remediate
+    - setTimeZone
+
+
+- hosts: redhat6
+  user: ec2-user
+  roles:
+    - rhel-prerequisites
+    - rhel6-stig-server-scan
+#    - rhel6-stig-server-remediate
+    - setTimeZone
+
 
 # - hosts: ubuntu
 #   user: ubuntu
@@ -45,7 +58,12 @@
 #   roles:
 #     - role: cent7-security-patch
 
-- hosts: redhat
-  user: ec2-user
-  roles:
-    - setTimeZone
+# - hosts: redhat
+#   user: ec2-user
+#   roles:
+#     - setTimeZone
+
+# - hosts: centos
+#   user: centos
+#   roles:
+#     - setTimeZone
