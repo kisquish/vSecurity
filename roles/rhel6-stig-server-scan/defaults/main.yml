@@ -9,8 +9,8 @@ rhPathToGetProfiles: /usr/share/xml/scap/ssg/content/
 
 # # on ansible host
 # # on both
-rhStigServerTailoringProfileScanResultName: rhel7-STIG-Server-result.xml
-rhStigServerTailoringProfileScanReportName: rhel7-STIG-Server-report.html
+rhStigServerTailoringProfileScanResultName: rhel6-STIG-Server-result.xml
+rhStigServerTailoringProfileScanReportName: rhel6-STIG-Server-report.html
 # rhStigServerTailoringProfile: ssg-rhel7-ds-tailoring.xml
 # rhStigServerTailoringProfileId: xccdf_org.ssgproject.content_profile_stig-rhel7-disa_customized
 # #######################################################

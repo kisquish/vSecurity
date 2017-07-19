@@ -1,53 +1,54 @@
-- name: install packages
-  yum:
-    name: audit
-    state: present
+# - name: install packages
+#   yum:
+#     name: audit
+#     state: present
 
-- name: Enable auditd Service
-  service:
-    name: auditd
-    enabled: yes
-  ignore_errors: yes
+# - name: Enable auditd Service
+#   service:
+#     name: auditd
+#     enabled: yes
+#   ignore_errors: yes
 
-- name: start auditd Service
-  service:
-    name: auditd
-    state: started
-  ignore_errors: yes
+# - name: start auditd Service
+#   service:
+#     name: auditd
+#     state: started
+#   ignore_errors: yes
 
-- name: start remediation block
-  lineinfile:
-    path: /etc/yum.conf
-    insertafter: '^installonly_limit=3'
-    line: '# REMEDIATION BLOCK'
-    state: present
+# - name: start remediation block
+#   lineinfile:
+#     path: /etc/yum.conf
+#     insertafter: '^installonly_limit=3'
+#     line: '# REMEDIATION BLOCK'
+#     state: present
 
-- name: Ensure YUM Removes Previous Package Versions
-  lineinfile:
-    path: /etc/yum.conf
-    insertafter: '^# REMEDIATION BLOCK'
-    regexp: '^clean_requirements_on_remove='
-    line: 'clean_requirements_on_remove=1'
-    state: present
-    backup: yes
 
-- name: Ensure gpgcheck Enabled for Local Packages
-  lineinfile:
-    path: /etc/yum.conf
-    insertafter: '^# REMEDIATION BLOCK'
-    regexp: '^localpkg_gpgcheck='
-    line: 'localpkg_gpgcheck=1'
-    state: present
-    backup: yes
+# - name: Ensure YUM Removes Previous Package Versions
+#   lineinfile:
+#     path: /etc/yum.conf
+#     insertafter: '^# REMEDIATION BLOCK'
+#     regexp: '^clean_requirements_on_remove='
+#     line: 'clean_requirements_on_remove=1'
+#     state: present
+#     backup: yes
 
-- name: Ensure gpgcheck Enabled for Repository Metadata
-  lineinfile:
-    path: /etc/yum.conf
-    insertafter: '^# REMEDIATION BLOCK'
-    regexp: '^repo_gpgcheck='
-    line: 'repo_gpgcheck=1'
-    state: present
-    backup: yes
+# - name: Ensure gpgcheck Enabled for Local Packages
+#   lineinfile:
+#     path: /etc/yum.conf
+#     insertafter: '^# REMEDIATION BLOCK'
+#     regexp: '^localpkg_gpgcheck='
+#     line: 'localpkg_gpgcheck=1'
+#     state: present
+#     backup: yes
+
+# - name: Ensure gpgcheck Enabled for Repository Metadata
+#   lineinfile:
+#     path: /etc/yum.conf
+#     insertafter: '^# REMEDIATION BLOCK'
+#     regexp: '^repo_gpgcheck='
+#     line: 'repo_gpgcheck=1'
+#     state: present
+#     backup: yes
 
 - name: ENSURE AIDE is installed
   yum:
@@ -57,45 +58,36 @@
     - aide
   register: aidePresence
 
-- name: Build and Test AIDE Database --> Generate the new Database
-  command: /usr/sbin/aide --init
-  register: aideInit
-  when: aidePresence.changed
+# - name: Build and Test AIDE Database --> Generate the new Database
+#   command: /usr/sbin/aide --init
+#   register: aideInit
+#   when: aidePresence.changed
 
-- name: AIDE Database Generation status
-  debug:
-    var: aideInit.stdout_lines
+# - name: AIDE Database Generation status
+#   debug:
+#     var: aideInit.stdout_lines
 
-- name: Build an Test AIDE Database --> Install newly Generated Database
-  command: cp -p /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
-  when: aideInit.changed
-
-- name: check AIDE Database
-  command: /usr/sbin/aide --check
-  register: aideCheck
-  when: aideInit.changed
-
-- name: AIDE Database check statut
-  debug:
-    var: aideCheck.stdout_lines
-
-# - name: Configure Periodic Execution of AIDE - implement a weekly Execution of AIDE at 4 05 AM using cron
-#   lineinfile:
-#     path: /etc/crontab
-#     line: '05 4 * * * root /usr/sbin/aide --check'
-#   ignore_erros: yes
+# - name: Build an Test AIDE Database --> Install newly Generated Database
+#   command: cp -p /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
 #   when: aideInit.changed
 
-- name: "Verify and Correct File Permissions with RPM --> Read list of files with incorrect permissions"
-  shell: "rpm -Va | grep '^.M' | sed -r 's;^.*\\s+(.+);\\1;g'"
-  register: files_with_incorrect_permissions
-  failed_when: False
-  changed_when: False
+# - name: check AIDE Database
+#   command: /usr/sbin/aide --check
+#   register: aideCheck
+#   when: aideInit.changed
 
-- name: "Verify and Correct File Permissions with RPM --> Correct file permissions with RPM"
-  shell: "rpm --setperms $(rpm -qf '{{item}}')"
-  with_items: "{{ files_with_incorrect_permissions.stdout_lines }}"
-  when: files_with_incorrect_permissions.stdout_lines | length > 0
+# - name: AIDE Database check statut
+#   debug:
+#     var: aideCheck.stdout_lines
+
+- name: Configure Periodic Execution of AIDE - implement a weekly Execution of AIDE at 4 05 AM using cron
+  lineinfile:
+    path: /etc/crontab
+    line: '05 4 * * * root /usr/sbin/aide --check'
+  ignore_erros: yes
+
+- name: Verify and Correct File Permissions with RPM
+  script: verifyandCorrectFilePermissionswithRPM.sh
 
 - name: start remediation block
   lineinfile:
@@ -104,15 +96,15 @@
     state: present
     backup: yes
 
-# - name: Add noexec Option to /dev/shm
-#   lineinfile:
-#     path: /etc/fstab
-#     insertafter: '^# REMEDIATION BLOCK'
-#     regexp: '^tmpfs   /dev/shm'
-#     line: 'tmpfs  /dev/shm            tmpfs defaults,noexec     0 0'
-#     state: present
+- name: Add noexec - Add nodev - Add nosuid Option to /dev/shm
+  lineinfile:
+    path: /etc/fstab
+    insertafter: '^# REMEDIATION BLOCK'
+    regexp: '^tmpfs   /dev/shm'
+    line: 'tmpfs  /dev/shm            tmpfs defaults,noexec,nodev,nosuid     0 0'
+    state: present
 
-- name: Ensure kernel module 'usb-storage' is disabled
+- name: Disable Modprobe Loading of USB Storage Driver
   lineinfile:
     create=yes
     dest="/etc/modprobe.d/{{item}}.conf"
@@ -120,6 +112,171 @@
     line="install {{item}} /bin/true"
   with_items:
     - usb-storage
+
+- name: Disable the Automounter - Disable autofs for all run levels
+  command: chkconfig autofs off
+
+- name: Verify that System Executables Have Root Ownership
+  script: verifythatSystemExecutablesHaveRootOwnership.sh
+
+- name: Set Daemon Umask
+  lineinfile:
+    path: /etc/init.d/functions
+    regexp: 'umask '
+    line: umask 027
+    state: present
+
+- name: Disable Core Dumps for All Users
+  lineinfile:
+    path: /etc/security/limits.conf
+    insertbefore: '^# End of file'
+    line: '*     hard    core    0'
+    state: present
+    backup: yes
+
+- name: Enable ExecShield
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'kernel.exec-shield = 1'
+    state: present
+
+- name: Enable Randomized Layout of Virtual Address Space
+#  script: enableRandomizedLayoutofVirtualAdressSpace.sh
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'kernel.randomize_va_space = 2'
+    state: present
+
+- name: Restrict Virtual Console Root Logins
+  lineinfile:
+    create=yes
+    dest="/etc/security"
+    line="vc/{{item}}"
+    state: absent
+  with_items:
+    - 1
+    - 2
+    - 3
+    - 4
+
+- name: Restrict Serial Port Root Logins
+  lineinfile:
+    create=yes
+    dest="/etc/security"
+    line="{{item}}"
+    state: absent
+  with_items:
+    - ttyS0
+    - ttyS1
+
+- name: "Prevent Log In to Accounts With Empty Password"
+  replace:
+    dest: /etc/pam.d/system-auth
+    regexp: 'nullok\s*'
+    replace: ''
+
+- name: Set Password Minimum Length in login.defs
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MIN_LEN '
+    line: 'PASS_MIN_LEN = 8'
+    state: present
+    backup: yes
+
+- name: Set Password Minimum Age
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MIN_DAYS '
+    line: 'PASS_MIN_DAYS    1'
+    state: present
+
+- name: Set Password Maximum Age
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MAX_DAYS '
+    line: 'PASS_MAX_DAYS   60'
+    state: present
+
+- name: "Set Account Expiration Following Inactivity"
+  lineinfile:
+    create=yes
+    dest="/etc/default/useradd"
+    regexp="^INACTIVE"
+    line="INACTIVE=60"
+
+- name: Set Password to Maximum of Three Consecutive Repeating Characters
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    line: 'password required pam_cracklib.so maxrepeat=3'
+    state: present
+    backup: yes 
+
+- name: Set Password Strength Minimum Digit Characters
+  script: setPasswordStrengthMinimumDigitCharacters.sh
+
+- name: Set Password Strength Minimum Uppercase Characters
+  script: setPasswordStrengthMinimumUppercaseCharacters.sh
+
+- name: Set Password Strength Minimum Special Characters
+  script: setPasswordStrengthMinimumSpecialCharacters.sh
+
+- name: Set Password Strength Minimum Lowercase Characters
+  script: SetPasswordStrengthMinimumLowercaseCharacters.sh
+
+- name: Set Password Strength Minimum Different Characters
+  script: SetPasswordStrengthMinimumDifferentCharacters.sh
+
+- name: Set Lockout Time For Failed Password Attempts
+  script: SetLockoutTimeForFailedPasswordAttempts.sh
+
+- name: Set Interval For Counting Failed Password Attempts
+  script: SetIntervalForCountingFailedPasswordAttempts.sh
+
+- name: Limit Password Reuse --- Set Password Hashing Algorithm in /etc/pam.d/system-auth
+  lineinfile:
+    path: /etc/pam.d/system-auth
+    regexp: '^password    sufficient    pam_unix.so '
+    line: 'password sufficient pam_unix.so sha512 shadow try_first_pass use_authtok remember=5'
+    state: present
+    backup: yes
+
+- name: Set Password Hashing Algorithm in /etc/login.defs
+  lineinfile:
+    path: /etc/log.defs
+    regexp: '^ENCRYPT_METHOD '
+    line: 'ENCRYPT_METHOD SHA512'
+    state: present
+
+- name: Set Password Hashing Algorithm in /etc/libuser.conf
+  lineinfile:
+    path: /etc/libuser.conf
+    regexp: '^crypt_style '
+    line: 'crypt_style sha512'
+    state: present
+
+- name: Set Last Login/Access Notification
+  script: SetLastLoginAccessNotification.sh
+
+- name: Ensure the Default Bash Umask is Set Correctly
+  script: EnsuretheDefaultBashUmaskisSetCorrectly.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - name: start remediation block
   lineinfile:
@@ -197,48 +354,8 @@
 - name: Disable Core Dumps for SUID programs
   script: disableCoreDumps4SUIDprograms.sh
 
-- name: Enable Randomized Layout of Virtual Address Space
-  script: enableRandomizedLayoutofVirtualAdressSpace.sh
-
 - name: Ensure No Device Files are Unlabeled by SELinux
   script: ensureNoDeviceFilesAreUnlabeledBySELinux.sh
-
-- name: "Prevent Log In to Accounts With Empty Password"
-  replace:
-    dest: /etc/pam.d/system-auth
-    regexp: 'nullok\s*'
-    replace: ''
-
-- name: Set Password Minimum Age
-  lineinfile:
-    path: /etc/login.defs
-    regexp: '^PASS_MIN_DAYS'
-    line: 'PASS_MIN_DAYS    1'
-    state: present
-    backup: yes  
-
-- name: Set Password Maximum Age
-  lineinfile:
-    path: /etc/login.defs
-    regexp: '^PASS_MAX_DAYS'
-    line: 'PASS_MAX_DAYS   60'
-    state: present
-
-- name: "Set Account Expiration Following Inactivity"
-  lineinfile:
-    create=yes
-    dest="/etc/default/useradd"
-    regexp="^INACTIVE"
-    line="INACTIVE=0"
-
-
-- name: Set Password Maximum Consecutive Repeating Characters
-  lineinfile:
-    path: /etc/security/pwquality.conf
-    regexp: '^# maxrepeat ='
-    line: 'maxrepeat = 2'
-    state: present
-    backup: yes 
 
 - name: Set Password to Maximum of Consecutive Repeating Characters from Same Character Class
   lineinfile:
@@ -247,20 +364,6 @@
     line: 'maxclassrepeat = 0'
     state: present
     backup: yes 
-
-- name: Set Password Strength Minimum Digit Characters
-  lineinfile:
-    path: /etc/security/pwquality.conf
-    regexp: '^# dcredit'
-    line: 'dcredit = -1'
-    state: present
-
-# - name: Set Password Minimum Length
-#   lineinfile:
-#     path: /etc/security/pwquality.conf
-#     regexp: '^# minlen'
-#     line: 'minlen = 15'
-#     state: present
 
 - name: Set Password Strength Minimum Uppercase Characters
   lineinfile:
@@ -343,42 +446,6 @@
     line: 'account required pam_faillock.so'
     state: present
 
-- name: Set Lockout Time For Failed Password Attempts -->  required pam_faillock including even_deny_root in auth section in system-auth
-  lineinfile:
-    path: /etc/pam.d/system-auth
-    insertbefore: '^auth        required      pam_deny.so'
-    line: 'auth required pam_faillock.so preauth silent even_deny_root deny=3 unlock_time=never fail_interval=900'
-    state: present
-
-- name: Set Lockout Time For Failed Password Attempts --> required pam_faillock including even_deny_root in auth section in password-auth
-  lineinfile:
-    path: /etc/pam.d/password-auth
-    insertbefore: '^auth        required      pam_deny.so'
-    line: 'auth required pam_faillock.so preauth silent even_deny_root deny=3 unlock_time=never fail_interval=900'
-    state: present
-
-- name: Set Lockout Time For Failed Password Attempts -->  required default in auth section including even_deny_root in system-auth
-  lineinfile:
-    path: /etc/pam.d/system-auth
-    insertafter: '^auth        sufficient    pam_unix.so nullok try_first_pass'
-    line: 'auth [default=die] pam_faillock.so authfail even_deny_root deny=3 unlock_time=never fail_interval=900'
-    state: present
-
-- name: Set Lockout Time For Failed Password Attempts --> required default in auth section including even_deny_root in password-auth
-  lineinfile:
-    path: /etc/pam.d/password-auth
-    insertafter: '^auth        sufficient    pam_unix.so nullok try_first_pass'
-    line: 'auth [default=die] pam_faillock.so authfail even_deny_root deny=3 unlock_time=never fail_interval=900'
-    state: present
-
-- name: Limit Password Reuse
-  lineinfile:
-    path: /etc/pam.d/system-auth
-    insertafter: '^password    sufficient    pam_unix.so sha512 shadow  try_first_pass use_authtok'
-    line: 'password sufficient pam_unix.so ...existing_options... remember=5'
-    state: present
-    backup: yes
-
 - name: Ensure Home Directories are Created for New Users
   lineinfile:
     path: /etc/login.defs
@@ -390,15 +457,6 @@
   lineinfile:
     path: /etc/profile
     line: 'TMOUT=600'
-    state: present
-    backup: yes
-
-- name: Limit the Number of Concurrent Login Sessions Allowed Per User
-  lineinfile:
-    path: /etc/security/limits.conf
-    insertbefore: '^# End of file'
-    regexp: '^#* hard maxlogins '
-    line: '*     hard    maxlogins    10'
     state: present
     backup: yes
 
