@@ -260,6 +260,204 @@
 - name: Ensure the Default Bash Umask is Set Correctly
   script: EnsuretheDefaultBashUmaskisSetCorrectly.sh
 
+- name: Ensure the Default C Shell Umask is Set Correctly
+  template:
+    src: csh.cshrc.j2
+    dest: /etc/csh.cshrc
+
+- name: Ensure the Default Umask is Set Correctly in /etc/profile
+  template:
+    src: profile.j2
+    dest: /etc/profile
+
+- name: Limit the Number of Concurrent Login Sessions Allowed Per User
+  lineinfile:
+    path: /etc/security/limits.conf
+#    regexp: '^'
+    insertbefore: '^# End of file'
+    line: '* hard maxlogins 10'
+    backup: yes
+
+- name: Install the screen Package
+  yum:
+    name: screen
+    state: present
+
+- name: Enable Smart Card Login
+  script: EnableSmartCardLogin.sh
+
+- name: Require Authentication for Single User Mode
+  lineinfile:
+    path: /etc/sysconfig/init
+    regexp: '^SINGLE=/sbin/sushell'
+    line: 'SINGLE=/sbin/sulogin'
+    state: present
+
+- name: Disable Ctrl-Alt-Del Reboot Activation
+  lineinfile:
+    path: /etc/sysconfig/init
+    regexp: '^exec /sbin/shutdown -r now "Control-Alt-Delete pressed"'
+    line: 'exec /usr/bin/logger -p security.info "Control-Alt-Delete pressed"'
+    state: present
+
+- name: Disable Interactive Boot
+  script: DisableInteractiveBoot.sh
+
+- name: Modify the System Login Banner
+  template:
+    src: systemLoginBanner.j2
+    dest: /etc/issue
+    backup: yes
+
+- name: Disable Kernel Parameter for Sending ICMP Redirects by Default
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.default.send_redirects = 0'
+    state: present
+    backup: yes
+
+- name: Disable Kernel Parameter for Sending ICMP Redirects for All Interfaces
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.all.send_redirects = 0'
+    state: present
+
+- name: Configure Kernel Parameter for Accepting Source-Routed Packets for All Interfaces
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.all.accept_source_route = 0'
+    state: present
+
+- name: Configure Kernel Parameter for Accepting ICMP Redirects for All Interfaces
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.all.accept_redirects = 0'
+    state: present
+
+- name: Configure Kernel Parameter for Accepting Secure Redirects for All Interfaces
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.all.secure_redirects = 0'
+    state: present
+
+- name: Configure Kernel Parameter to Log Martian Packets
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.all.log_martians = 1'
+    state: present
+
+- name: Configure Kernel Parameter for Accepting ICMP Redirects By Default
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.default.accept_redirects = 0'
+    state: present
+
+- name: Configure Kernel Parameter to Ignore ICMP Broadcast Echo Requests
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.icmp_echo_ignore_broadcasts = 1'
+    state: present
+
+- name: Configure Kernel Parameter for Accepting Secure Redirects By Default
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.default.secure_redirects = 0'
+    state: present
+
+
+- name: Configure Kernel Parameter to Ignore Bogus ICMP Error Responses
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.icmp_ignore_bogus_error_responses = 1'
+    state: present
+
+- name: Configure Kernel Parameter to Use Reverse Path Filtering for All Interfaces
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.all.rp_filter = 1'
+    state: present
+
+- name: Disable Bluetooth Kernel Modules
+  lineinfile:
+    path: /etc/modprobe.d/dist.conf
+    line: 'install bluetooth /bin/true'
+    state: present
+    backup: yes
+
+##################### TO CONFIRM ########################
+- name: Disable IPv6 Networking Support Automatic Loading
+  lineinfile:
+    path: /etc/modprobe.d/openfwwf.conf
+    line: 'options ipv6 disable=1'
+    state: present
+##########################################################
+
+- name: Configure Accepting IPv6 Redirects
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv6.conf.default.accept_redirects = 0'
+    state: present
+
+##################### TO CONFIRM ########################
+- name: Set Default ip6tables Policy for Incoming Packets
+  lineinfile:
+    path: /etc/sysconfig/ip6tables
+    insertafter: '^*filter'
+    regexp: '^:INPUT ACCEPT [0:0]'
+    line: ':INPUT DROP [0:0]'
+    state: present
+##########################################################
+
+- name: Disable DCCP Support
+  lineinfile:
+    path: /etc/modprobe.d/dist.conf
+    line: 'install dccp /bin/true'
+    state: present
+    backup: yes
+
+- name: Disable SCTP Support
+  lineinfile:
+    path: /etc/modprobe.d/dist.conf
+    line: 'install sctp /bin/true'
+    state: present
+    backup: yes
+
+- name: Disable RDS Support
+  lineinfile:
+    path: /etc/modprobe.d/dist.conf
+    line: 'install rds /bin/true'
+    state: present
+    backup: yes
+
+- name: Disable TIPC Support
+  lineinfile:
+    path: /etc/modprobe.d/dist.conf
+    line: 'install tipc /bin/true'
+    state: present
+    backup: yes
+
+- name: Install openswan or libreswan Package
+  yum:
+    name: libreswan
+    state: present
+
+- name: Ensure System Log Files Have Correct Permissions
+  script: EnsureSystemLogFilesHaveCorrectPermissions.sh
+
+- name: Configure auditd space_left Action on Low Disk Space
+  script: Configureauditdspace_leftActiononLowDiskSpace.sh
+
+- name: Configure auditd admin_space_left Action on Low Disk Space
+  script: Configureauditdadmin_space_leftActiononLowDiskSpace.sh
+
+
+
+
+
+
+
+
+
 
 
 
@@ -474,47 +672,10 @@
 - name: Disable Ctrl-Alt-Del Reboot Activation
   command: systemctl mask ctrl-alt-del.target
 
-- name: Modify the System Login Banner
-  template:
-    src: systemLoginBanner.j2
-    dest: /etc/issue
-    backup: yes
-
-- name: Disable Kernel Parameter for Sending ICMP Redirects by Default
-  lineinfile:
-    path: /etc/sysctl.conf
-    line: 'net.ipv4.conf.default.send_redirects = 0'
-    state: present
-    backup: yes
-
-- name: Disable Kernel Parameter for Sending ICMP Redirects for All Interfaces
-  lineinfile:
-    path: /etc/sysctl.conf
-    line: 'net.ipv4.conf.all.send_redirects = 0'
-    state: present
-
 - name: Disable Kernel Parameter for IP Forwarding
   lineinfile:
     path: /etc/sysctl.conf
     line: 'net.ipv4.ip_forward = 0'
-    state: present
-
-- name: Configure Kernel Parameter for Accepting ICMP Redirects for All Interfaces
-  lineinfile:
-    path: /etc/sysctl.conf
-    line: 'net.ipv4.conf.all.accept_redirects = 0'
-    state: present
-
-- name: Configure Kernel Parameter for Accepting ICMP Redirects By Default
-  lineinfile:
-    path: /etc/sysctl.conf
-    line: 'net.ipv4.conf.default.accept_redirects = 0'
-    state: present
-
-- name: Configure Kernel Parameter to Ignore ICMP Broadcast Echo Requests
-  lineinfile:
-    path: /etc/sysctl.conf
-    line: 'net.ipv4.icmp_echo_ignore_broadcasts = 1'
     state: present
 
 # - name: Enable service firewalld
