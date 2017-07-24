@@ -1,54 +1,18 @@
-# - name: install packages
-#   yum:
-#     name: audit
-#     state: present
+- name: Ensure Solid State Drives Do Not Contribute To Random-Number Entropy Pool
+  script: EnsureSolidStateDrivesDoNotContributeToRandom-NumberEntropyPool.sh
 
-# - name: Enable auditd Service
-#   service:
-#     name: auditd
-#     enabled: yes
-#   ignore_errors: yes
+############## TO DO List : When creating RHEL 6 Instaces #############################
+# Ensure /tmp Located On Separate Partition
+# Ensure /var Located On Separate Partition
+# Ensure /var/log Located On Separate Partition
+# Ensure /var/log/audit Located On Separate Partition
+# Ensure /home Located On Separate Partition
+#################################################################################
 
-# - name: start auditd Service
-#   service:
-#     name: auditd
-#     state: started
-#   ignore_errors: yes
-
-# - name: start remediation block
-#   lineinfile:
-#     path: /etc/yum.conf
-#     insertafter: '^installonly_limit=3'
-#     line: '# REMEDIATION BLOCK'
-#     state: present
-
-
-# - name: Ensure YUM Removes Previous Package Versions
-#   lineinfile:
-#     path: /etc/yum.conf
-#     insertafter: '^# REMEDIATION BLOCK'
-#     regexp: '^clean_requirements_on_remove='
-#     line: 'clean_requirements_on_remove=1'
-#     state: present
-#     backup: yes
-
-# - name: Ensure gpgcheck Enabled for Local Packages
-#   lineinfile:
-#     path: /etc/yum.conf
-#     insertafter: '^# REMEDIATION BLOCK'
-#     regexp: '^localpkg_gpgcheck='
-#     line: 'localpkg_gpgcheck=1'
-#     state: present
-#     backup: yes
-
-# - name: Ensure gpgcheck Enabled for Repository Metadata
-#   lineinfile:
-#     path: /etc/yum.conf
-#     insertafter: '^# REMEDIATION BLOCK'
-#     regexp: '^repo_gpgcheck='
-#     line: 'repo_gpgcheck=1'
-#     state: present
-#     backup: yes
+- name: install packages
+  yum:
+    name: audit
+    state: present
 
 - name: ENSURE AIDE is installed
   yum:
@@ -58,33 +22,11 @@
     - aide
   register: aidePresence
 
-# - name: Build and Test AIDE Database --> Generate the new Database
-#   command: /usr/sbin/aide --init
-#   register: aideInit
-#   when: aidePresence.changed
-
-# - name: AIDE Database Generation status
-#   debug:
-#     var: aideInit.stdout_lines
-
-# - name: Build an Test AIDE Database --> Install newly Generated Database
-#   command: cp -p /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
-#   when: aideInit.changed
-
-# - name: check AIDE Database
-#   command: /usr/sbin/aide --check
-#   register: aideCheck
-#   when: aideInit.changed
-
-# - name: AIDE Database check statut
-#   debug:
-#     var: aideCheck.stdout_lines
-
 - name: Configure Periodic Execution of AIDE - implement a weekly Execution of AIDE at 4 05 AM using cron
   lineinfile:
     path: /etc/crontab
     line: '05 4 * * * root /usr/sbin/aide --check'
-  ignore_erros: yes
+  ignore_errors: yes
 
 - name: Verify and Correct File Permissions with RPM
   script: verifyandCorrectFilePermissionswithRPM.sh
@@ -147,27 +89,27 @@
     line: 'kernel.randomize_va_space = 2'
     state: present
 
-- name: Restrict Virtual Console Root Logins
-  lineinfile:
-    create=yes
-    dest="/etc/security"
-    line="vc/{{item}}"
-    state: absent
-  with_items:
-    - 1
-    - 2
-    - 3
-    - 4
+# - name: Restrict Virtual Console Root Logins
+#   lineinfile:
+#     create: yes
+#     path: /etc/security
+#     line: 'vc/{{item}}'
+#     state: absent
+#   with_items:
+#     - 1
+#     - 2
+#     - 3
+#     - 4
 
-- name: Restrict Serial Port Root Logins
-  lineinfile:
-    create=yes
-    dest="/etc/security"
-    line="{{item}}"
-    state: absent
-  with_items:
-    - ttyS0
-    - ttyS1
+# - name: Restrict Serial Port Root Logins
+#   lineinfile:
+#     create: yes
+#     path: /etc/security
+#     line: '{{item}}'
+#     state: absent
+#   with_items:
+#     - ttyS0
+#     - ttyS1
 
 - name: "Prevent Log In to Accounts With Empty Password"
   replace:
@@ -242,7 +184,7 @@
 
 - name: Set Password Hashing Algorithm in /etc/login.defs
   lineinfile:
-    path: /etc/log.defs
+    path: /etc/login.defs
     regexp: '^ENCRYPT_METHOD '
     line: 'ENCRYPT_METHOD SHA512'
     state: present
@@ -399,13 +341,13 @@
     state: present
 
 ##################### TO CONFIRM ########################
-- name: Set Default ip6tables Policy for Incoming Packets
-  lineinfile:
-    path: /etc/sysconfig/ip6tables
-    insertafter: '^*filter'
-    regexp: '^:INPUT ACCEPT [0:0]'
-    line: ':INPUT DROP [0:0]'
-    state: present
+# - name: Set Default ip6tables Policy for Incoming Packets
+#   lineinfile:
+#     path: /etc/sysconfig/ip6tables
+#     insertafter: '^*filter'
+#     regexp: '^:INPUT ACCEPT [0:0]'
+#     line: ':INPUT DROP [0:0]'
+#     state: present
 ##########################################################
 
 - name: Disable DCCP Support
@@ -450,391 +392,270 @@
 - name: Configure auditd admin_space_left Action on Low Disk Space
   script: Configureauditdadmin_space_leftActiononLowDiskSpace.sh
 
+- name: Record attempts to alter time through adjtimex
+  script: Recordattemptstoaltertimethroughadjtimex.sh
+
+- name: Record attempts to alter time through settimeofday
+  script: Recordattemptstoaltertimethroughsettimeofday.sh
+
+- name: Record Attempts to Alter Time Through stime
+  script: RecordAttemptstoAlterTimeThroughstime.sh
 
 
+- name: Record Attempts to Alter Time Through clock_settime
+  script: RecordAttemptstoAlterTimeThroughclock_settime.sh
 
+- name: Record Attempts to Alter the localtime File
+  script: RecordAttemptstoAlterthelocaltimeFile.sh
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-- name: start remediation block
-  lineinfile:
-    path: /etc/default/grub
-    line: '# REMEDIATION BLOCK'
-    state: present
-
-- name: Disable Kernel Support for USB via Bootloader Configuration
-  script: disableKernelSupportUSBviaBootloaderConfiguration.sh
-
-- name: Ensure kernel module 'cramfs' is disabled
-  lineinfile:
-    create=yes
-    dest="/etc/modprobe.d/{{item}}.conf"
-    regexp="{{item}}"
-    line="install {{item}} /bin/true"
-  with_items:
-    - cramfs
-
-- name: Ensure kernel module 'freevxfs' is disabled
-  lineinfile:
-    create=yes
-    dest="/etc/modprobe.d/{{item}}.conf"
-    regexp="{{item}}"
-    line="install {{item}} /bin/true"
-  with_items:
-    - freevxfs
-
-- name: Ensure kernel module 'jffs2' is disabled
-  lineinfile:
-    create=yes
-    dest="/etc/modprobe.d/{{item}}.conf"
-    regexp="{{item}}"
-    line="install {{item}} /bin/true"
-  with_items:
-    - jffs2
-
-- name: Ensure kernel module 'hfs' is disabled
-  lineinfile:
-    create=yes
-    dest="/etc/modprobe.d/{{item}}.conf"
-    regexp="{{item}}"
-    line="install {{item}} /bin/true"
-  with_items:
-    - hfs
-
-- name: Ensure kernel module 'hfsplus' is disabled
-  lineinfile:
-    create=yes
-    dest="/etc/modprobe.d/{{item}}.conf"
-    regexp="{{item}}"
-    line="install {{item}} /bin/true"
-  with_items:
-    - hfsplus
-
-
-- name: Ensure kernel module 'squashfs' is disabled
-  lineinfile:
-    create=yes
-    dest="/etc/modprobe.d/{{item}}.conf"
-    regexp="{{item}}"
-    line="install {{item}} /bin/true"
-  with_items:
-    - squashfs
-
-- name: Ensure kernel module 'udf' is disabled
-  lineinfile:
-    create=yes
-    dest="/etc/modprobe.d/{{item}}.conf"
-    regexp="{{item}}"
-    line="install {{item}} /bin/true"
-  with_items:
-    - udf
-
-- name: Disable Core Dumps for SUID programs
-  script: disableCoreDumps4SUIDprograms.sh
-
-- name: Ensure No Device Files are Unlabeled by SELinux
-  script: ensureNoDeviceFilesAreUnlabeledBySELinux.sh
-
-- name: Set Password to Maximum of Consecutive Repeating Characters from Same Character Class
-  lineinfile:
-    path: /etc/security/pwquality.conf
-    regexp: '^# maxclassrepeat ='
-    line: 'maxclassrepeat = 0'
-    state: present
-    backup: yes 
-
-- name: Set Password Strength Minimum Uppercase Characters
-  lineinfile:
-    path: /etc/security/pwquality.conf
-    regexp: '^# ucredit = '
-    line: 'ucredit = -1'
-    state: present
-
-- name: Set Password Strength Minimum Special Characters
-  lineinfile:
-    path: /etc/security/pwquality.conf
-    regexp: '^# ocredit = '
-    line: 'ocredit = -1'
-    state: present
-
-- name: Set Password Strength Minimum Lowercase Characters
-  lineinfile:
-    path: /etc/security/pwquality.conf
-    regexp: '^# lcredit = '
-    line: 'lcredit = -6'
-    state: present
-
-# - name: Set Password Strength Minimum Different Characters
-#   lineinfile:
-#     path: /etc/security/pwquality.conf
-#     regexp: '^# difok'
-#     line: 'difok = 8'
-#     state: present
-
-- name: Set Password Strength Minimum Different Categories
-  lineinfile:
-    path: /etc/security/pwquality.conf
-    regexp: '^# minclass = '
-    line: 'minclass = 4'
-    state: present
-    backup: yes
-
-
-- name: Set Deny For Failed Password Attempts -->  required pam_faillock in auth section in system-auth
-  lineinfile:
-    path: /etc/pam.d/system-auth
-    insertbefore: '^auth        sufficient    pam_unix.so nullok try_first_pass'
-    line: 'auth required pam_faillock.so preauth silent deny=3 unlock_time=never fail_interval=900'
-    state: present
-    backup: yes
-
-- name: Set Deny For Failed Password Attempts --> required pam_faillock in auth section in password-auth
-  lineinfile:
-    path: /etc/pam.d/password-auth
-    insertbefore: '^auth        sufficient    pam_unix.so nullok try_first_pass'
-    line: 'auth required pam_faillock.so preauth silent deny=3 unlock_time=never fail_interval=900'
-    state: present
-    backup: yes
-
-- name: Set Deny For Failed Password Attempts -->  required default in auth section in system-auth
-  lineinfile:
-    path: /etc/pam.d/system-auth
-    insertafter: '^auth        sufficient    pam_unix.so nullok try_first_pass'
-    line: 'auth [default=die] pam_faillock.so authfail deny=3 unlock_time=never fail_interval=900'
-    state: present
-
-- name: Set Deny For Failed Password Attempts --> required default in auth section in password-auth
-  lineinfile:
-    path: /etc/pam.d/password-auth
-    insertafter: '^auth        sufficient    pam_unix.so nullok try_first_pass'
-    line: 'auth [default=die] pam_faillock.so authfail deny=3 unlock_time=never fail_interval=900'
-    state: present
-
-- name: Set Deny For Failed Password Attempts -->  required account in account section in system-auth
-  lineinfile:
-    path: /etc/pam.d/system-auth
-    insertbefore: '^account     required      pam_unix.so'
-    line: 'account required pam_faillock.so'
-    state: present
-
-- name: Set Deny For Failed Password Attempts --> required account in account section in password-auth
-  lineinfile:
-    path: /etc/pam.d/password-auth
-    insertbefore: '^account     required      pam_unix.so'
-    line: 'account required pam_faillock.so'
-    state: present
-
-- name: Ensure Home Directories are Created for New Users
-  lineinfile:
-    path: /etc/login.defs
-    line: 'CREATE_HOME yes'
-    state: present
-    backup: yes
-
-- name: Set Interactive Session Timeout
-  lineinfile:
-    path: /etc/profile
-    line: 'TMOUT=600'
-    state: present
-    backup: yes
-
-- name: Ensure the Logon Failure Delay is Set Correctly in login.defs
-  lineinfile:
-    path: /etc/login.defs
-    line: 'FAIL_DELAY 4'
-    state: present
-
-- name: Verify /boot/grub2/grub.cfg Permissions
-  file:
-    path: /boot/grub2/grub.cfg
-    mode: 0600
-
-- name: Disable Ctrl-Alt-Del Reboot Activation
-  command: systemctl mask ctrl-alt-del.target
-
-- name: Disable Kernel Parameter for IP Forwarding
-  lineinfile:
-    path: /etc/sysctl.conf
-    line: 'net.ipv4.ip_forward = 0'
-    state: present
-
-# - name: Enable service firewalld
-#   service:
-#     name="{{item}}"
-#     enabled="yes"
-#     state="started"
-#   with_items:
-#     - firewalld
-
-# - name: Set Default firewalld Zone for Incoming Packets
-#   lineinfile:
-#     path: /etc/firewalld/firewalld.conf
-#     line: DfaultZone=drop
-#     state: present
-
-- name: Configure auditd space_left Action on Low Disk Space
+- name: Record Events that Modify the Systems Discretionary Access Controls - chmod
   lineinfile:
     create: yes
-    path: /etc/audit/auditd.conf
-    line: 'space_left_action = ACTION'
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S chmod  -F auid>=500 -F auid!=4294967295 -k perm_mod'
     state: present
 
-- name: Ensure libreswan and tcp_wrappers Package are installed
-  yum:
-    name="{{item}}"
-    state=present
-  with_items:
-    - libreswan
-  ignore_errors: yes
-
-- name: Install tcp_wrappers Package Ensure 
-  yum:
-    name="{{item}}"
-    state=present
-  with_items:
-    - tcp_wrappers
-  ignore_errors: yes
-
-- name: Disable service kdump
-  service:
-    name="{{item}}"
-    enabled="no"
-    state="stopped"
-  with_items:
-    - kdump
-
-- name: Allow Only SSH Protocol 2
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    insertafter: '^# The default requires explicit activation of protocol 1'
-    regexp: '^#Protocol '
-    line: 'Protocol 2'
-    backup: yes
-
-- name: Disable GSSAPI Authentication
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    insertafter: '^# GSSAPI options'
-    regexp: '^GSSAPIAuthentication '
-    line: 'GSSAPIAuthentication no'
-
-- name: Disable Kerberos Authentication
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#KerberosAuthentication no'
-    line: 'KerberosAuthentication no'
-
-- name: Enable Use of Strict Mode Checking
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^UsePrivilegeSeparation '
-    line: 'UsePrivilegeSeparation yes'
-
-- name: Enable Use of Privilege Separation
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#StrictModes yes'
-    line: 'StrictModes yes'
-
-- name: Disable Compression Or Set Compression to delayed
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#Compression delayed'
-    line: 'Compression delayed'
-
-- name: Print Last Log
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#PrintLastLog yes'
-    line: 'PrintLastLog yes'
-
-- name: "SSHD: Set client alive interval"
+- name: Record Events that Modify the Systems Discretionary Access Controls - chown
   lineinfile:
     create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S chown -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - fchmod
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S fchmod -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - fchmodat
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - fchown
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S fchown -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - fchownat
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S fchownat -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - fremovexattr
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - fsetxattr
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S fsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - lchown
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - lremovexattr
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S lremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - lsetxattr
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S lsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - removexattr
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S removexattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify the Systems Discretionary Access Controls - setxattr
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=b64 -S setxattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+    state: present
+
+- name: Record Events that Modify User/Group Information
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-{{item}}'
+    state: present
+  with_items:
+    - w /etc/group -p wa -k audit_rules_usergroup_modification
+    - w /etc/passwd -p wa -k audit_rules_usergroup_modification
+    - w /etc/gshadow -p wa -k audit_rules_usergroup_modification
+    - w /etc/shadow -p wa -k audit_rules_usergroup_modification
+    - w /etc/security/opasswd -p wa -k audit_rules_usergroup_modification
+
+- name: Record Events that Modify the Systems Network Environment
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-{{item}}'
+    state: present
+  with_items:
+    - a always,exit -F arch=ARCH -S sethostname -S setdomainname -k audit_rules_networkconfig_modification
+    - w /etc/issue -p wa -k audit_rules_networkconfig_modification
+    - w /etc/issue.net -p wa -k audit_rules_networkconfig_modification
+    - w /etc/hosts -p wa -k audit_rules_networkconfig_modification
+    - w /etc/sysconfig/network -p wa -k audit_rules_networkconfig_modification
+
+- name: Record Events that Modify the Systems Mandatory Access Controls
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-w /etc/selinux/ -p wa -k MAC-policy'
+    state: present
+
+- name: Ensure auditd Collects Unauthorized Access Attempts to Files (unsuccessful)
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-{{item}}'
+    state: present
+  with_items:
+    - a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access
+    - a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access
+
+- name: Ensure auditd Collects Information on the Use of Privileged Commands
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F path=SETUID_PROG_PATH -F perm=x -F auid>=500 -F auid!=4294967295 -k privileged'
+    state: present
+
+- name: Ensure auditd Collects Information on Exporting to Media (successful)
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=ARCH -S mount -F auid>=500 -F auid!=4294967295 -k export'
+    state: present
+
+- name: Ensure auditd Collects File Deletion Events by User
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-a always,exit -F arch=ARCH -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F auid!=4294967295 -k delete'
+    state: present
+
+- name: Ensure auditd Collects System Administrator Actions
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-w /etc/sudoers -p wa -k actions'
+    state: present
+
+- name: Ensure auditd Collects Information on Kernel Module Loading and Unloading
+  lineinfile:
+    create: yes
+    path: /etc/audit/audit.rules
+    line: '-{{item}}'
+    state: present
+  with_items:
+    - w /sbin/insmod -p x -k modules
+    - w /sbin/rmmod -p x -k modules
+    - w /sbin/modprobe -p x -k modules
+    - a always,exit -F arch=ARCH -S init_module -S delete_module -k modules
+
+- name: Enable Auditing for Processes Which Start Prior to the Audit Daemon
+  script: EnableAuditingforProcessesWhichStartPriortotheAuditDaemon.sh
+
+- name: Disable Automatic Bug Reporting Tool (abrtd)
+  command: chkconfig abrtd off
+
+- name: Disable Red Hat Network Service (rhnsd)
+  command: chkconfig rhnsd off
+
+- name: Set SSH Idle Timeout Interval
+  lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^ClientAliveInterval'
-    line: 'ClientAliveInterval 600'
+    insertafter: '^#ClientAliveInterval 0'
+#    regexp: '^#ClientAliveInterval 0'
+    line: 'ClientAliveInterval 900'
+    backup: yes
 
 - name: Set SSH Client Alive Count
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^#ClientAliveCountMax 3'
+    insertafter: '^#ClientAliveCountMax 3'
+#    regexp: '^#ClientAliveCountMax 3'
     line: 'ClientAliveCountMax 0'
-
-- name: Disable SSH Support for User Known Hosts
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#IgnoreUserKnownHosts no'
-    line: 'IgnoreUserKnownHosts yes'
-
-- name: Disable SSH Support for Rhosts RSA Authentication
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#RhostsRSAAuthentication'
-    line: 'RhostsRSAAuthentication no'
-
 
 - name: Disable SSH Root Login
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^#PermitRootLogin'
+    insertafter: '^#PermitRootLogin yes'
+#    regexp: '^#ClientAliveInterval 0'
     line: 'PermitRootLogin no'
 
-- name: "SSHD: Disable empty passwords"
-  lineinfile:
-    create=yes
-    dest="/etc/ssh/sshd_config"
-    regexp="^PermitEmptyPasswords"
-    line="PermitEmptyPasswords no"
+######################## TO CONFIRM #########################
+# - name: Disable SSH Access via Empty Passwords
+#   lineinfile:
+#     path: /etc/ssh/sshd_config
+#     insertafter: '^#PermitEmptyPasswords no'
+# #    regexp: '^#ClientAliveInterval 0'
+#     line: '#PermitEmptyPasswords no'
+##############################################################
 
-- name: "SSHD: Enable warning banner"
+- name: "SSHD: Enable SSH Warning Banner"
   lineinfile:
-    create=yes
-    dest="/etc/ssh/sshd_config"
-    regexp="^Banner"
-    line="Banner /etc/issue"
+    path: /etc/ssh/sshd_config
+    insertafter: '^#Banner none'
+    line: 'Banner /etc/issue'
+
+- name: Set SSH Idle Timeout Interval
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    insertafter: '^#ClientAliveInterval 0'
+#    regexp: '^#ClientAliveInterval 0'
+    line: 'ClientAliveInterval 900'
 
 - name: "SSHD: Do not permit user environment"
   lineinfile:
-    create=yes
-    dest="/etc/ssh/sshd_config"
-    regexp="^PermitUserEnvironment"
-    line="PermitUserEnvironment no"
+    path: /etc/ssh/sshd_config
+    insertafter: "^#PermitUserEnvironment no"
+    line: 'PermitUserEnvironment no'
 
-- name: Use Only FIPS 140-2 Validated Ciphers
+- name: "Use Only Approved Ciphers"
   lineinfile:
     path: /etc/ssh/sshd_config
-    insertafter: '^# Ciphers and keying'
-    line: 'Ciphers aes128-ctr,aes192-ctr,aes256-ctr'
+    line: 'Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc'
 
-- name: Use Only FIPS 140-2 Validated MACs
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    insertafter: '^# Ciphers and keying'
-    line: 'Ciphers aes128-ctr,aes192-ctr,aes256-ctr'
+######################## TO CONFIRM #########################
+# Disable DHCP Client
+##############################################################
 
-- name: Use Only FIPS 140-2 Validated MACs
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    insertbefore: '^# Authentication:'
-    line: 'MACs hmac-sha2-512,hmac-sha2-256'
+######################## TO CONFIRM #########################
+# Enable the NTP Daemon
+# - name: Enable the NTP Daemon
+#   command: chkconfig --level 2345 ntpd on
+##############################################################
+
+######################## TO CONFIRM #########################
+# Require Client SMB Packet Signing, if using smbclient
+##############################################################

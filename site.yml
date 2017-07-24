@@ -29,9 +29,9 @@
 - hosts: redhat6
   user: ec2-user
   roles:
-    - rhel-prerequisites
+#    - rhel-prerequisites
+    - rhel6-stig-server-remediate
     - rhel6-stig-server-scan
-#    - rhel6-stig-server-remediate
     - setTimeZone
 
 
