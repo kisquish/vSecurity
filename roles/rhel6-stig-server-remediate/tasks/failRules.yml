@@ -31,6 +31,11 @@
 - name: Verify and Correct File Permissions with RPM
   script: verifyandCorrectFilePermissionswithRPM.sh
 
+################## TO CONFIRM #######################
+# Install Virus Scanning Software
+
+#####################################################
+
 - name: start remediation block
   lineinfile:
     path: /etc/fstab
@@ -38,13 +43,24 @@
     state: present
     backup: yes
 
-- name: Add noexec - Add nodev - Add nosuid Option to /dev/shm
-  lineinfile:
-    path: /etc/fstab
-    insertafter: '^# REMEDIATION BLOCK'
-    regexp: '^tmpfs   /dev/shm'
-    line: 'tmpfs  /dev/shm            tmpfs defaults,noexec,nodev,nosuid     0 0'
-    state: present
+#- name: Add noexec - Add nodev - Add nosuid Option to /dev/shm
+  # lineinfile:
+  #   path: /etc/fstab
+  #   insertafter: '^# REMEDIATION BLOCK'
+  #   regexp: '^tmpfs   /dev/shm'
+  #   line: 'tmpfs  /dev/shm            tmpfs defaults,noexec,nodev,nosuid     0 0'
+  #   state: present
+
+########### REMEDIATION DONE / Not matched report ##################
+- name: Add nodev Option to /dev/shm
+  script: AddnodevOptionto-dev-shm.sh
+
+- name: Add noexec Option to /dev/shm
+  script: AddnoexecOptionto-dev-shm.sh
+
+- name: Add nosuid Option to /dev/shm
+  script: AddnosuidOptionto-dev-shm.sh
+####################################################################
 
 - name: Disable Modprobe Loading of USB Storage Driver
   lineinfile:
@@ -89,27 +105,28 @@
     line: 'kernel.randomize_va_space = 2'
     state: present
 
-# - name: Restrict Virtual Console Root Logins
-#   lineinfile:
-#     create: yes
-#     path: /etc/security
-#     line: 'vc/{{item}}'
-#     state: absent
-#   with_items:
-#     - 1
-#     - 2
-#     - 3
-#     - 4
+- name: Restrict Virtual Console Root Logins
+  command: sed -i '/^vc\//d' /etc/securetty
+  # lineinfile:
+  #   create: yes
+  #   path: /etc/securetty
+  #   line: 'vc/{{item}}'
+  #   state: absent
+  # with_items:
+  #   - 1
+  #   - 2
+  #   - 3
+  #   - 4
 
-# - name: Restrict Serial Port Root Logins
-#   lineinfile:
-#     create: yes
-#     path: /etc/security
-#     line: '{{item}}'
-#     state: absent
-#   with_items:
-#     - ttyS0
-#     - ttyS1
+- name: Restrict Serial Port Root Logins
+  lineinfile:
+    create: yes
+    path: /etc/securetty
+    line: '{{item}}'
+    state: absent
+  with_items:
+    - ttyS0
+    - ttyS1
 
 - name: "Prevent Log In to Accounts With Empty Password"
   replace:
@@ -120,15 +137,15 @@
 - name: Set Password Minimum Length in login.defs
   lineinfile:
     path: /etc/login.defs
-    regexp: '^PASS_MIN_LEN '
-    line: 'PASS_MIN_LEN = 8'
+    regexp: '^PASS_MIN_LEN    5'
+    line: 'PASS_MIN_LEN    14'
     state: present
     backup: yes
 
 - name: Set Password Minimum Age
   lineinfile:
     path: /etc/login.defs
-    regexp: '^PASS_MIN_DAYS '
+    regexp: '^PASS_MIN_DAYS   0'
     line: 'PASS_MIN_DAYS    1'
     state: present
 
@@ -144,7 +161,7 @@
     create=yes
     dest="/etc/default/useradd"
     regexp="^INACTIVE"
-    line="INACTIVE=60"
+    line="INACTIVE=35"
 
 - name: Set Password to Maximum of Three Consecutive Repeating Characters
   lineinfile:
@@ -164,6 +181,9 @@
 
 - name: Set Password Strength Minimum Lowercase Characters
   script: SetPasswordStrengthMinimumLowercaseCharacters.sh
+
+- name: Set Deny For Failed Password Attempts
+  script: SetDenyForFailedPasswordAttempts.sh
 
 - name: Set Password Strength Minimum Different Characters
   script: SetPasswordStrengthMinimumDifferentCharacters.sh
@@ -192,9 +212,31 @@
 - name: Set Password Hashing Algorithm in /etc/libuser.conf
   lineinfile:
     path: /etc/libuser.conf
-    regexp: '^crypt_style '
-    line: 'crypt_style sha512'
+    regexp: '^crypt_style = md5'
+    line: 'crypt_style = sha512'
     state: present
+# - name: make sure md5 Password Hashing Algorithm is absent in /etc/libuser.conf
+#   lineinfile:
+#     path: /etc/libuser.conf
+#     regexp: '^crypt_style = md5'
+#     line: 'crypt_style = md5'
+#     state: absent
+
+#################### TO CONFIRM #########################
+# Set Boot Loader Password
+#########################################################
+
+- name: Set GNOME Login Inactivity Timeout
+  script: SetGNOMELoginInactivityTimeout.sh
+
+- name: GNOME Desktop Screensaver Mandatory Use
+  script: GNOMEDesktopScreensaverMandatoryUse.sh
+
+- name: Enable Screen Lock Activation After Idle Period
+  script: EnableScreenLockActivationAfterIdlePeriod.sh
+
+- name: Implement Blank Screensaver
+  script: ImplementBlankScreensaver.sh
 
 - name: Set Last Login/Access Notification
   script: SetLastLoginAccessNotification.sh
@@ -236,20 +278,45 @@
     state: present
 
 - name: Disable Ctrl-Alt-Del Reboot Activation
-  lineinfile:
-    path: /etc/sysconfig/init
-    regexp: '^exec /sbin/shutdown -r now "Control-Alt-Delete pressed"'
-    line: 'exec /usr/bin/logger -p security.info "Control-Alt-Delete pressed"'
-    state: present
+  script: DisableCtrl-Alt-DelRebootActivation.sh
+  # lineinfile:
+  #   path: /etc/sysconfig/init
+  #   regexp: '^exec /sbin/shutdown -r now "Control-Alt-Delete pressed"'
+  #   line: 'exec /usr/bin/logger -p security.info "Control-Alt-Delete pressed"'
+  #   state: present
 
 - name: Disable Interactive Boot
   script: DisableInteractiveBoot.sh
 
+########### REMEDIATION DONE / Not matched report ##################
 - name: Modify the System Login Banner
   template:
-    src: systemLoginBanner.j2
+    src: issue.j2
     dest: /etc/issue
     backup: yes
+####################################################################
+
+- name: Configure /etc/sysctl.conf
+  lineinfile:
+    path: /etc/sysctl.conf
+    insertafter: '^# Controls IP packet forwarding'
+    line: '{{item}}'
+    state: present
+    backup: yes
+  with_items:
+    - net.ipv4.conf.default.send_redirects = 0
+    - net.ipv4.conf.all.send_redirects = 0
+    - net.ipv4.conf.all.accept_source_route = 0
+    - net.ipv4.conf.all.accept_redirects = 0
+    - net.ipv4.conf.all.secure_redirects = 0
+    - net.ipv4.conf.all.log_martians = 1
+    - net.ipv4.conf.default.accept_redirects = 0
+    - net.ipv4.icmp_echo_ignore_broadcasts = 1
+    - net.ipv4.conf.default.secure_redirects = 0
+    - net.ipv4.icmp_ignore_bogus_error_responses = 1
+    - net.ipv4.conf.all.rp_filter = 1
+    - net.ipv4.ip_forward = 0
+    - net.ipv4.conf.default.accept_source_route = 0
 
 - name: Disable Kernel Parameter for Sending ICMP Redirects by Default
   lineinfile:
@@ -350,6 +417,16 @@
 #     state: present
 ##########################################################
 
+##################### TO CONFIRM ########################
+# Verify iptables Enabled
+# Set Default iptables Policy for Incoming Packets
+# Set Default iptables Policy for Forwarded Packets
+##########################################################
+
+##################### TO CONFIRM ########################
+# Ensure Logs Sent To Remote Host
+##########################################################
+
 - name: Disable DCCP Support
   lineinfile:
     path: /etc/modprobe.d/dist.conf
@@ -408,96 +485,137 @@
 - name: Record Attempts to Alter the localtime File
   script: RecordAttemptstoAlterthelocaltimeFile.sh
 
+##################################################################################
 - name: Record Events that Modify the Systems Discretionary Access Controls - chmod
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S chmod  -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-chmod.sh
 
-- name: Record Events that Modify the Systems Discretionary Access Controls - chown
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S chown -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+- name: Record Events that Modify the Systems Discretionary Access Controls - chow
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-chow.sh
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - fchmod
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S fchmod -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-chow.sh
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - fchmodat
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-fchmodat.sh
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - fchown
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S fchown -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-fchown.sh
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - fchownat
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S fchownat -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-fchownat.sh
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - fremovexattr
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-fremovexattr.sh
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - fsetxattr
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S fsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-fsetxattr.sh
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - lchown
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-lchown.sh
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - lremovexattr
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S lremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-lremovexattr.sh
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - lsetxattr
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S lsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-lsetxattr.sh 
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - removexattr
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S removexattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-removexattr.sh   
 
 - name: Record Events that Modify the Systems Discretionary Access Controls - setxattr
-  lineinfile:
-    create: yes
-    path: /etc/audit/audit.rules
-    line: '-a always,exit -F arch=b64 -S setxattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
-    state: present
+  script: RecordEventsthatModifytheSystemsDiscretionaryAccessControls-setxattr.sh
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - chmod
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S chmod  -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - chown
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S chown -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - fchmod
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S fchmod -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - fchmodat
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - fchown
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S fchown -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - fchownat
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S fchownat -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - fremovexattr
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - fsetxattr
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S fsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - lchown
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - lremovexattr
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S lremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - lsetxattr
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S lsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - removexattr
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S removexattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+
+# - name: Record Events that Modify the Systems Discretionary Access Controls - setxattr
+#   lineinfile:
+#     create: yes
+#     path: /etc/audit/audit.rules
+#     line: '-a always,exit -F arch=b64 -S setxattr -F auid>=500 -F auid!=4294967295 -k perm_mod'
+#     state: present
+##################################################################################
 
 - name: Record Events that Modify User/Group Information
   lineinfile:

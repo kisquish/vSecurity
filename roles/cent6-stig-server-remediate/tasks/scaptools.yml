@@ -1,0 +1,13 @@
+- name: make sure some packages are installed
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - curl
+    - libselinux-python
+
+- name: installing OpenSCAP packages
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - openscap-scanner
+    - scap-workbench
