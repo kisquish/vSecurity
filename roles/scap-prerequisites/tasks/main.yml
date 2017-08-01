@@ -1,0 +1,46 @@
+---
+# tasks file for roles/scap-prerequisites
+
+# - name: scap-prerequisites on Centos major version 6
+#   include: cent6-prerequisites.yml
+#   when: "ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6'
+
+# # - name: scap-prerequisites on Centos major version 7
+# #   include: cent7-prerequisites.yml
+# #   when: "ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
+
+# - name: scap-prerequisites on RedHat major version 6
+#   include: cent6-prerequisites.yml
+#   when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '6'
+
+# - name: scap-prerequisites on RedHat major version 6
+#   include: cent6-prerequisites.yml
+#   when: "ansible_distribution == 'RedHat' and ansible_distribution_major_version == '7'
+
+- name: scap prerequisites on centos 6.X
+  include: cent6-prerequisites.yml
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+    - ansible_os_family == "CentOS"
+
+- name: scap prerequisites on centos 7.X
+  include: cent7-prerequisites.yml
+  when:
+    - ansible_distribution == "CentOS"  
+    - ansible_distribution_major_version == "7"
+    - ansible_os_family == "CentOS"
+
+- name: scap prerequisites on redhat 6.X
+  include: rhel6-prerequisites.yml
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "6"
+    - ansible_os_family == "6"
+
+- name: scap prerequisites on redhat 7.X
+  include: rhel7-prerequisites.yml
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_os_family == "RedHat"

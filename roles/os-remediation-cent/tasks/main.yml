@@ -1,0 +1,19 @@
+---
+# tasks file for os-remediation-cent
+
+- name: remediate centos 6.X
+  include: cent6-X-failedRules.yml
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+#    - ansible_os_family == "CentOS"
+
+- name: remediate centos 7.X
+  include: "{{item}}"
+  when:
+    - ansible_distribution == "CentOS"  
+    - ansible_distribution_major_version == "7"
+#    - ansible_os_family == "CentOS"
+  with_items:
+    - cent7-X-failedRules.yml
+    - cent7-X-passedRules.yml

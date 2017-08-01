@@ -1,12 +1,19 @@
-- hosts: tag_airbus_ansiblemanagement_Target_RedHat #si ne marche pas, tester airbus_ansiblemanagement_Target_RedHat au lieu de tag_airbus_ansiblemanagement_Target_RedHat
+- hosts: tag_airbus_ansiblemanagement_Target_RedHat
   user: ec2-user
   roles:
     - rhel-prerequisites
     - rhel7-stig-server-scan
+
+    - rhel6-prerequisites
+    - rhel6-stig-server-scan
+
     - setTimeZone
 
-- hosts: tag_airbus_ansiblemanagement_Target_CentOS #si ne marche pas, tester airbus_ansiblemanagement_Target_CentOS au lieu de tag_airbus_ansiblemanagement_Target_CentOS
+- hosts: tag_airbus_ansiblemanagement_Target_CentOS
   user: centos
   roles:
     - cent-prerequisites
+
+    - cent6-prerequisites
+
     - setTimeZone

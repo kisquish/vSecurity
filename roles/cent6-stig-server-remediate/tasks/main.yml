@@ -1,5 +1,5 @@
-- name: installing scap tools
-  include: scaptools.yml
+# - name: installing scap tools
+#   include: scaptools.yml
   
 # - name: MAKE SURE PASS RULES ARE STILL CORRECTS
 #   include: passRules.yml
