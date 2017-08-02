@@ -1,3 +1,4 @@
 ---
 centRemoteUser: centos
-centRemoteScapDirectory: /home/centos/scap/
+centRemoteScapDirectory: /home/{{centRemoteUser}}/scap/
+centRemoteScapDirectoryTools: /home/{{centRemoteUser}}/scap-tools/

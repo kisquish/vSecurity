@@ -1,11 +1,22 @@
 ---
 # tasks file for roles/rhel-prerequisites
 
-# - name: set timezone to UTC
-#     name: utc
+- name: create scap-tools on remote targets - on RedHat_6.X
+  file:
+    path: "{{ rhRemoteScapDirectoryTools }}"
+    state: directory
+#    mode: 0755
+
+- name: transfert scap tools on remote targets - on RedHat_6.X
+  copy:
+    src: rhel6-scap-tools/
+    dest: "{{ rhRemoteScapDirectoryTools }}rhel6-scap-tools"
+#    directory_mode: True
+    force: yes
 
 - name: make sure some packages are installed on RedHat_6.X
   yum:
+#    name: "{{ rhRemoteScapDirectoryTools }}rhel6-scap-tools/{{ item }}"
     name: "{{ item }}"
   with_items:
     - curl
@@ -13,11 +24,14 @@
 
 - name: installing OpenSCAP packages on RedHat_6.X
   yum:
-    name: "{{ item }}"
+    name: "{{ rhRemoteScapDirectoryTools }}rhel6-scap-tools/{{ item }}"
   with_items:
-    - openscap-scanner
-    - scap-security-guide
-    - scap-workbench
+    - openscap-scanner-1.2.13-2.el6.x86_64.rpm
+    - scap-security-guide-0.1.28-3.el6.noarch.rpm
+    - scap-workbench-1.1.1-1.el6.x86_64.rpm
+#    - scap-security-guide
+#    - openscap-scanner
+#    - scap-workbench
 
 - name: create directory to store results & reports
   file:

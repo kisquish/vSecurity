@@ -1,17 +1,23 @@
+---
+
 - hosts: tag_airbus_ansiblemanagement_Target_RedHat
   user: ec2-user
   roles:
     - rhel-prerequisites
-    - rhel7-stig-server-scan
-    - rhel7-stig-server-remediate
-    - rhel7-stig-server-scan
+    
+    - os-remediation-rhel
+
+    - os-assesment-rhel
+
     - setTimeZone
 
 - hosts: tag_airbus_ansiblemanagement_Target_CentOS
   user: centos
   roles:
     - cent-prerequisites
-    - cent7-stig-server-remediate
+
+    - os-remediation-cent
+
     - setTimeZone
 
 # - hosts: tag_airbus_ansiblemanagement_Target_RedHat

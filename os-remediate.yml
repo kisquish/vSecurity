@@ -4,14 +4,18 @@
   user: ec2-user
   roles:
     - rhel-prerequisites
-    - rhel7-stig-server-remediate
+    
+    - os-remediation-rhel
+
     - setTimeZone
 
 - hosts: tag_airbus_ansiblemanagement_Target_CentOS
   user: centos
   roles:
     - cent-prerequisites
-    - cent7-stig-server-remediate
+
+    - os-remediation-cent
+
     - setTimeZone
 
 

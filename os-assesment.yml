@@ -1,11 +1,11 @@
+---
+
 - hosts: tag_airbus_ansiblemanagement_Target_RedHat
   user: ec2-user
   roles:
     - rhel-prerequisites
-    - rhel7-stig-server-scan
 
-    - rhel6-prerequisites
-    - rhel6-stig-server-scan
+    - os-assesment-rhel
 
     - setTimeZone
 
@@ -14,6 +14,24 @@
   roles:
     - cent-prerequisites
 
-    - cent6-prerequisites
-
     - setTimeZone
+
+# - hosts: tag_airbus_ansiblemanagement_Target_RedHat
+#   user: ec2-user
+#   roles:
+#     - rhel-prerequisites
+#     - rhel7-stig-server-scan
+
+#     - rhel6-prerequisites
+#     - rhel6-stig-server-scan
+
+#     - setTimeZone
+
+# - hosts: tag_airbus_ansiblemanagement_Target_CentOS
+#   user: centos
+#   roles:
+#     - cent-prerequisites
+
+#     - cent6-prerequisites
+
+#     - setTimeZone
