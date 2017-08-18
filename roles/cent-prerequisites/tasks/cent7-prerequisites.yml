@@ -3,14 +3,17 @@
   file:
     path: "{{ centRemoteScapDirectoryTools }}"
     state: directory
-#    mode: 0755
+# #    mode: 0755
 
 - name: transfert scap tools on remote targets - on CentOS_7.X
   copy:
     src: cent7-scap-tools/
     dest: "{{ centRemoteScapDirectoryTools }}cent7-scap-tools"
-#    directory_mode: True
-#    force: yes
+# #    directory_mode: True
+    force: yes
+
+# - name: enable certain repos - on CentOS_7.X
+#   command: yum-config-manager --add-repo rhui2-cds01.eu-west-1.aws.ce.redhat.com rhui2-cds02.eu-west-1.aws.ce.redhat.com
 
 - name: make sure some packages are installed on CentOS_7.X
   yum:
@@ -22,12 +25,13 @@
 
 - name: installing OpenSCAP packages on CentOS_7.X
   yum:
+#    name: "{{item}}"
     name: "{{ centRemoteScapDirectoryTools }}cent7-scap-tools/{{ item }}"
   with_items:
     - openscap-scanner-1.2.10-3.el7_3.x86_64.rpm
     - scap-workbench-1.1.2-1.el7.x86_64.rpm
-    # - openscap-scanner
-    # - scap-workbench
+    #- openscap-scanner
+    #- scap-workbench
 
 - name: create directory to store results & reports - on CentOS_7.X
   file:

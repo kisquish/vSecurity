@@ -21,21 +21,11 @@
   debug:
     var: result.stdout_lines
 
-- name: SCAN The system to evaluate STIG SERVER TAILORING Profile - on redhat 6.X
-  command: oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_stig-rhel6-server-upstream --results-arf {{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanResultName }} --report {{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanReportName }} /usr/share/xml/scap/ssg/content/ssg-rhel6-ds.xml
+- name: SCAN The system to evaluate STIG SERVER UPSTREAM Profile - on redhat 6.X
+  command: oscap xccdf eval --fetch-remote-resources --profile xccdf_org.ssgproject.content_profile_stig-rhel6-server-upstream --results-arf {{ rhRemoteScapDirectory }}{{ rh6StigServerProfileScanResultName }} --report {{ rhRemoteScapDirectory }}{{ rh6StigServerProfileScanReportName }} {{ rhPathToGetProfiles }}ssg-rhel6-ds.xml
   register: output
   ignore_errors: yes
 
-- name: Displaying scanning output - on redhat 6.X
-  debug:
-    var: output.stdout_lines
-
-# - name: tranfert report to Ansible Host
-#   fetch:
-#     src: "{{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanReportName }}"
-#     dest: "{{ rhPathToStoreResults }}{{ rhStigServerTailoringProfileScanReportName }}"
-
-# - name: tranfert results to Ansible Host
-#   fetch:
-#     src: "{{ rhRemoteScapDirectory }}{{ rhStigServerTailoringProfileScanResultName }}"
-#     dest: "{{ rhPathToStoreResults }}{{ rhStigServerTailoringProfileScanResultName }}"
+# - name: Displaying scanning output - on redhat 6.X
+#   debug:
+#     var: output.stdout_lines

@@ -703,8 +703,8 @@
 - name: Enable Auditing for Processes Which Start Prior to the Audit Daemon - on centos 6.X
   script: EnableAuditingforProcessesWhichStartPriortotheAuditDaemon.sh
 
-- name: Disable Automatic Bug Reporting Tool (abrtd) - on centos 6.X
-  command: chkconfig abrtd off
+# - name: Disable Automatic Bug Reporting Tool (abrtd) - on centos 6.X
+#   command: chkconfig abrtd off
 
 # - name: Disable Red Hat Network Service (rhnsd) - on centos 6.X
 #   command: chkconfig rhnsd off

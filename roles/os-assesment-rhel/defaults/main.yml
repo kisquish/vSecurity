@@ -1,2 +1,14 @@
 ---
 # defaults file for os-assesment-rhel
+## common
+rhPathToGetProfiles: /usr/share/xml/scap/ssg/content/
+rhRemoteUser: ec2-user
+rhRemoteScapDirectory: "/home/{{rhRemoteUser}}/scap/"
+
+## RHEL 6.X ##
+rh6StigServerProfileScanResultName: rhel6-STIG-Server-result.xml
+rh6StigServerProfileScanReportName: rhel6-STIG-Server-report.html
+
+## RHEL 7.X ##
+rhStigServerTailoringProfileScanResultName: rhel7-STIG-Server-result.xml
+rhStigServerTailoringProfileScanReportName: rhel7-STIG-Server-report.html

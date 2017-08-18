@@ -1,8 +1,0 @@
-# - name: installing scap tools
-#   include: scaptools.yml
-  
-# - name: MAKE SURE PASS RULES ARE STILL CORRECTS
-#   include: passRules.yml
-
-- name: REMEDIATION of FAILLED RULES
-  include: failRules.yml

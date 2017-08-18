@@ -23,13 +23,13 @@
   user: ec2-user
   roles:
      - rhel-prerequisites
-     #- os-remediation-rhel
-     - os-assesment-rhel
-     #- setTimeZone
+#     - os-remediation-rhel
+#     - os-assesment-rhel
+#     - setTimeZone
 
 - hosts: centos
   user: centos
   roles:
     - cent-prerequisites
-    #- os-remediation-cent
-    #- setTimeZone
+#    - os-remediation-cent
+#    - setTimeZone

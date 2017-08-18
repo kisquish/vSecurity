@@ -1,0 +1,13 @@
+---
+# tasks file for roles/win_common
+- name: 2.  Install up-to-date system
+  win_updates:
+    category_names:
+      - SecurityUpdates
+      - CriticalUpdates
+      - UpdateRollups
+
+- name: 4.  Update
+  win_updates:
+    category_names:
+      - SecurityUpdates
