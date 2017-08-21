@@ -11,3 +11,218 @@
   win_updates:
     category_names:
       - SecurityUpdates
+
+# - name: 6.  Disable recycle bin
+#   win_command: "{{ item }}"
+#   with_items:
+#     - rd /s /q %systemdrive%\$RECYCLE.BIN
+#     - rd /s /q d:\$RECYCLE.BIN
+
+# - name: 6.  Disable recycle bin
+#   win_command: rd /s /q %systemdrive%\$RECYCLE.BIN
+# - name: 6.  Disable recycle bin
+#   win_command: rd /s /q d:\$RECYCLE.BIN
+
+# - name: create user
+#   win_user:
+#     name: aws_tower
+#     password: ab!t0werP@55
+#     state: present
+#     groups:
+#       - Users
+#     groups_action: add
+#   register: aws_tower_created
+# - name: add aws_tower to administrators
+#   win_command: net localgroup administrators aws_tower /add
+#   when: aws_tower_created.changed
+# - name: reboot to save changes
+#   win_reboot:
+#  when: aws_tower_created.changed
+
+- name: 7.  Rename local administrator account
+  win_command: wmic useraccount where name='aws_tower' call rename name='new_aws_tower'
+
+- name: 8.  Rename and deactivate guest account
+  win_command: wmic useraccount where name='Guest' call rename name='aws_tower_Guest'
+
+- name: 9.  Create a honeypot account
+  win_user:
+    name: aws_tower
+    password: ab!t0werP@55
+    state: present
+    groups:
+      - Users
+    groups_action: add
+  register: aws_tower_created
+# - name: add aws_tower to administrators
+#   win_command: net localgroup administrators aws_tower /add
+#   when: aws_tower_created.changed
+
+# 10. Avoid using local accounts
+# 11. Use unique local account’s name and password
+# 12. Apply password policy
+- name: 13. Set service start mode -- Manual mode - Started state
+  win_service:
+    name: "{{ item }}"
+    start_mode: manual
+    state: started
+  with_items:
+    - Application Experience
+    - Application Management
+    - Certificate Propagation
+    - Network Connections
+    - Windows Modules Installer
+    - Windows Time
+
+- name: 13. Set service start mode -- Manual mode - Stopped state
+  win_service:
+    name: "{{ item }}"
+    start_mode: manual
+    state: stopped
+  with_items:
+    - Application Identity
+    - Application Information
+    #- Background Intelligent Transfert Service
+    - CNG Key Isolation
+    #- COM+ Event System Application
+    - Credential Manager
+    - Device Install Service
+    - Diagnostic Service Host
+    - Diagnostic System Host
+    #- Encryption File System (EFS)
+    - Extensible Authentication Protocol
+    - Function Discovery Provider Host
+    #- Function Discovery Resources Publication
+    - Health Key and Certificate Management
+    #- Human Interface Device Access
+    - IKE and AuthIP IPsec Keying Modules
+    - Interactive Services Detection
+    - KtmRm for Distributed Transaction Coordinator
+    - Microsoft Software Shadow Copy Provider
+    - Network Access Protection Agent
+    - Optimize drives
+    - Performance Counter DLL Host
+    - Performance Logs & Alerts
+    - Portable Device Enumerator Service
+    - Printer Extensions and Notifications
+    - Problem Reports and Solutions Control Panel Support
+    - Remote Desktop Configuration
+    - Remote Procedure Call (RPC) Locator
+    - Resultant Set of Policy Provider
+    - Secure Socket Tunneling Protocol Service
+    - Shell Hardware Detection
+    - Smart Card
+    - Smart Card Removal Policy
+    - SNMP Trap
+    - Superfetch
+    - Telephony
+    - Thread Ordering Server
+    - Virtual Disk
+    - Volume Shadow Copy
+    #- Windows All-User Install Agent
+    - Windows Driver Foundation - User-mode Driver Framework
+    - Windows Event Collector
+    - Windows Font Cache Service
+    - Windows Installer
+    - Wired AutoConfig
+    - WMI Performance Adapter
+
+
+- name: 13. Set service start mode -- Disabled mode - Stopped state
+  win_service:
+    name: "{{ item }}"
+    start_mode: disabled
+    state: stopped
+  with_items:
+    - Application Layer Gateway Service
+    - Computer Browser
+    - Device Association Service
+    - Device Setup Manager
+    - Hyper-V Data Exchange Service
+    - Hyper-V Guest Shutdown Service
+    - Hyper-V Heartbeat Service
+    - Hyper-V Remote Desktop Virtualization Service
+    - Hyper-V Time Synchronization Service
+    #- Hyper-V Shadow Copy Requestor
+    - Internet Connection Sharing (ICS)
+    - IP Helper
+    - IPsec Policy Agent
+    - KDC Proxy Server Service (KPS)
+    #- Link-Layer Topplogy Discovery Mapper
+    - Microsoft iSCSI Initiator Service
+    - Multimedia Class Scheduler
+    - Net.Tcp Port Sharing Service
+    - Network Connectivity Assistant
+    - Print Spooler
+    - Remote Access Auto Connection Manager
+    - Routing and Remote Access
+    - Special Administration Console Helper
+    - SSDP Discovery
+    #- TP AutoConnect Service
+    #- TP VC Gateway Service
+    - UPnP Device Host
+    - Windows Audio Endpoint Builder
+    - Windows Color System
+    - Windows Error Reporting Service
+    #- Windows Store Service
+    - WinHTTP Web Proxy Auto-Discovery Service
+    #- Windows Audio
+    - Themes
+
+
+- name: 13. Set service start mode -- Automatic mode - Started state
+  win_service:
+    name: "{{ item }}"
+    start_mode: auto
+    state: started
+  with_items:
+    - Base Filtering Engine
+    - COM+ Event System
+    - Cryptographic Services
+    - DCOM Server Process Launcher
+    - DHCP Client
+    ######## TO DISCUSS ######
+    #- Diagnostic Policy Service  ## USED FOR SYSTEM DIAGNOSTIC
+    - Distributed Link Tracking Client
+    - Distributed Transaction Coordinator
+    - DNS Client
+    - Group Policy Client
+    #- Netlogon
+    - Network List Service
+    - Network Location Awareness
+    - Network Store Interface Service
+    - Plug and Play
+    - Power
+    - Remote Desktop Services
+    - Remote Desktop Services UserMode Port Redirector
+    - Remote Procedure Call (RPC)
+    - RPC Endpoint Mapper
+    - Secondary Logon
+    - Security Accounts Manager
+    - Server
+    - Software Protection
+    - Spot Verifier
+    - System Event Notification Service
+    - Task Scheduler
+    - User Profile Service
+    - Windows Event Log
+    - Windows Firewall
+    - Windows Management Instrumentation
+    - Windows Update
+    - Workstation
+    - Windows Remote Management (WS-Management)
+
+- name: 13. Set service start mode -- Automatic mode - Stopped state
+  win_service:
+    name: "{{ item }}"
+    start_mode: auto
+    state: stopped
+  with_items:
+    - Remote Registry
+    - TCP/IP NetBIOS Helper
+    - User Access Logging Service
+    ######## TO DISCUSS ######
+    #- Local Session Manager ## IT WILL CAUSE SYSTEM INSTABILITY
+
+- name: reboot to save changes
+  win_reboot:
