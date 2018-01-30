@@ -1,0 +1,53 @@
+---
+# tasks file for roles/rhel-prerequisites
+
+- name: create directory to store results & reports
+  file:
+    path: "{{ rhRemoteScapDirectory }}"
+    state: directory
+    mode: 0755
+
+- name: create scap-tools on remote targets - on RedHat_7.X
+  file:
+    path: "{{ rhRemoteScapDirectoryTools }}"
+    state: directory
+#    mode: 0755
+
+- name: transfert scap tools on remote targets - on RedHat_7.X
+  copy:
+    src: rhel7-scap-tools/
+    dest: "{{ rhRemoteScapDirectoryTools }}rhel7-scap-tools"
+#    directory_mode: True
+    force: yes
+
+- name: make sure some packages are installed on RedHat_7.X
+  yum:
+#    name: "{{ rhRemoteScapDirectoryTools }}rhel7-scap-tools/{{ item }}"
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - curl
+    - libselinux-python
+
+# - name: clear yum cache
+# #  command: yum makecache fast
+#   command: yum clean all
+
+- name: installing OpenSCAP packages on RedHat_7.X
+  yum:
+    name: "{{ item }}"
+#    name: "{{ rhRemoteScapDirectoryTools }}rhel7-scap-tools/{{ item }}"
+    state: present
+  with_items:
+    # - openscap-scanner-1.2.14-2.el7.x86_64.rpm
+    # - scap-security-guide-0.1.33-5.el7.noarch.rpm
+    # - scap-workbench-1.1.4-5.el7.x86_64.rpm
+    - scap-security-guide
+    - openscap-scanner
+    - scap-workbench
+
+- name: create directory to store results & reports
+  file:
+    path: "{{ rhRemoteScapDirectory }}"
+    state: directory
+    mode: 0755

@@ -1,23 +1,19 @@
 ---
 # tasks file for roles/rhel-prerequisites
 
-# - name: set timezone to UTC
-#     name: utc
+- name: scap prerequisites on redhat 6.X
+  include: rhel6-prerequisites.yml
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "6"
+#    - ansible_os_family == "6"
 
-- name: make sure some packages are installed
-  yum:
-    name: "{{ item }}"
-  with_items:
-    - curl
-    - libselinux-python
-
-- name: installing OpenSCAP packages
-  yum:
-    name: "{{ item }}"
-  with_items:
-    - openscap-scanner
-    - scap-security-guide
-    - scap-workbench
+- name: scap prerequisites on redhat 7.X
+  include: rhel7-prerequisites.yml
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+#    - ansible_os_family == "RedHat"
 
 - name: create directory to store results & reports
   file:

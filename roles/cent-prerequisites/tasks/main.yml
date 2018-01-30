@@ -1,32 +1,19 @@
 ---
 # tasks file for roles/cent-prerequisites
  
-- name: make sure some packages are installed
-  yum:
-    name: "{{ item }}"
-  with_items:
-    - curl
-    - libselinux-python
+- name: scap prerequisites on centos 6.X
+  include: cent6-prerequisites.yml
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+#    - ansible_os_family == "CentOS"
 
-# - name: installing cloudwatch --> 
-#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-
-# - name: installing cloudwatch
-#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-
-# - name: installing cloudwatch
-#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-
-# - name: installing cloudwatch
-#   command: curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-
-# - name: installing OpenSCAP packages
-#   yum:
-#     name: "{{ item }}"
-#   with_items:
-#     - openscap-scanner
-#     - scap-security-guide
-#     - scap-workbench
+- name: scap prerequisites on centos 7.X
+  include: cent7-prerequisites.yml
+  when:
+    - ansible_distribution == "CentOS"  
+    - ansible_distribution_major_version == "7"
+#     - ansible_os_family == "CentOS"
 
 - name: create directory to store results & reports
   file:

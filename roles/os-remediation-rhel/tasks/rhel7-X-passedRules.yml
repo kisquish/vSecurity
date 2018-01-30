@@ -1,0 +1,255 @@
+########################
+- name: install packages - on redhat 7.X
+  yum:
+    name: audit
+    state: present
+
+- name: Enable auditd Service - on redhat 7.X
+  service:
+    name: auditd
+    enabled: yes
+  ignore_errors: yes
+
+- name: start auditd Service - on redhat 7.X
+  service:
+    name: auditd
+    state: started
+  ignore_errors: yes
+    
+- name: Ensure gpgcheck Enabled In Main Yum Configuration - on redhat 7.X
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^gpgcheck='
+    line: 'gpgcheck=1'
+    state: present
+    backup: yes
+
+
+- name: "Verify File Hashes with RPM --> Set fact: Package manager reinstall command (dnf) - on redhat 7.X"
+  set_fact:
+    package_manager_reinstall_cmd: dnf reinstall -y
+  when: ansible_distribution == "Fedora"
+
+- name: "Verify File Hashes with RPM --> Set fact: Package manager reinstall command (yum) - on redhat 7.X"
+  set_fact:
+    package_manager_reinstall_cmd: yum reinstall -y
+  when: ansible_distribution == "RedHat"
+
+- name: "Verify File Hashes with RPM --> Read files with incorrect hash - on redhat 7.X"
+  shell: "rpm -Va | grep -E '^..5.* /(bin|sbin|lib|lib64|usr)/' | sed -r 's;^.*\\s+(.+);\\1;g'"
+  register: files_with_incorrect_hash
+  changed_when: False
+  when: package_manager_reinstall_cmd is defined
+
+- name: "Verify File Hashes with RPM --> Reinstall packages of files with incorrect hash - on redhat 7.X"
+  shell: "{{package_manager_reinstall_cmd}} $(rpm -qf '{{item}}')"
+  with_items: "{{ files_with_incorrect_hash.stdout_lines }}"
+  when: package_manager_reinstall_cmd is defined and (files_with_incorrect_hash.stdout_lines | length > 0)
+
+
+- name: Disable Prelinking - on redhat 7.X
+  lineinfile:
+    create: yes
+    path: /etc/sysconfig/prelinking
+    line: 'PRELINKING=no' 
+
+# - name: Disable the Automounter - on redhat 7.X
+#   command: systemctl disable autofs
+
+# - name: Install PAE Kernel on Supported 32-bit x86 Systems - on redhat 7.X
+#   yum:
+#     name: kernel-PAE
+#     state: present
+
+- name: Ensure SELinux Not Disabled in /etc/default/grub - on redhat 7.X
+  lineinfile:
+    path: /etc/default/grub
+    line: 'selinux=0'
+    state: absent
+
+- name: Configure SELinux Policy - on redhat 7.X
+  lineinfile:
+    path: /etc/selinux/config
+    line: 'SELINUXTYPE=targeted'
+    state: present
+
+- name: Verify /boot/grub2/grub.cfg User Ownership - on redhat 7.X
+  command: chown root /boot/grub2/grub.cfg
+
+- name: Verify /boot/grub2/grub.cfg Group Ownership - on redhat 7.X
+  command: chgrp root /boot/grub2/grub.cfg
+
+- name: Configure Kernel Parameter for Accepting Source-Routed Packets for All Interfaces - on redhat 7.X
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.all.accept_source_route = 0'
+    state: present
+
+- name: Configure Kernel Parameter for Accepting Source-Routed Packets By Default - on redhat 7.X
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: 'net.ipv4.conf.default.accept_source_route = 0'
+    state: present
+
+- name: Disable Zeroconf Networking - on redhat 7.X
+  lineinfile:
+    path: /etc/sysconfig/network
+    line: 'NOZEROCONF=yes'
+
+- name: Configure auditd mail_acct Action on Low Disk Space - on redhat 7.X
+  lineinfile:
+    create: yes
+    path: /etc/audit/auditd.conf
+    line: 'action_mail_acct = root'
+
+# - name: Disable xinetd service  - on redhat 7.X
+#   service:
+#     name: xinetd
+#     enabled: no
+
+- name: Uninstall xinetd Package - on redhat 7.X
+  yum:
+    name: xinetd
+    state: absent
+
+- name: Uninstall telnet-server Package - on redhat 7.X
+  yum:
+    name: telnet-server
+    state: absent
+
+- name: Remove telnet Clients - on redhat 7.X
+  yum:
+    name: telnet
+    state: absent
+
+- name: Uninstall rsh-server Package - on redhat 7.X
+  yum:
+    name: rsh-server
+    state: absent
+
+- name: Uninstall rsh package - on redhat 7.X
+  yum:
+    name: rsh
+    state: absent
+
+- name: Uninstall ypserv package - on redhat 7.X
+  yum:
+    name: ypserv
+    state: absent
+
+- name: Remove NIS Clients - on redhat 7.X
+  yum:
+    name: ypbind
+    state: absent
+
+- name: Uninstall tftp-server Package - on redhat 7.X
+  yum:
+    name: tftp-server
+    state: absent
+
+- name: Remove tftp Daemon - on redhat 7.X
+  yum:
+    name: tftp
+    state: absent
+
+- name: Uninstall talk-server Package - on redhat 7.X
+  yum:
+    name: talk-server
+    state: absent
+
+- name: Uninstall talk Package - on redhat 7.X
+  yum:
+    name: talk
+    state: absent
+
+# - name: Verify User Who Owns /etc/cron.allow file - on redhat 7.X
+#   file:
+#     path: /etc/cron.allow
+#     owner: root
+
+# - name: Enable cron Service - on redhat 7.X
+#   service:
+#     name: crond
+#     enabled: yes
+
+- name: Disable anacron Service - on redhat 7.X
+  yum:
+    name: cronie-anacron
+    state: absent
+
+- name: Disable SSH Support for .rhosts Files - on redhat 7.X
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#IgnoreRhosts'
+    line: 'IgnoreRhosts yes'
+
+- name: Disable Host-Based Authentication - on redhat 7.X
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#HostbasedAuthentication'
+    line: 'HostbasedAuthentication no'
+
+- name: Enable Encrypted X11 Forwarding - on redhat 7.X
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^X11Forwarding'
+    line: 'X11Forwarding yes'
+
+- name: Install the OpenSSH Server Package - on redhat 7.X
+  yum:
+    name: openssh-server
+    state: present
+
+- name: Enable the OpenSSH Service - on redhat 7.X
+  service:
+    name: sshd
+    enabled: yes
+
+# - name: Verify Permissions on SSH Server Public *.pub Key Files - on redhat 7.X
+#   command: chmod 0400 /etc/ssh/{{item}}
+#   with_items:
+#     - ssh_host_ecdsa_key.pub
+#     - ssh_host_ed25519_key.pub
+#     - ssh_host_rsa_key.pub
+# #  command: chmod 0644 /etc/ssh/*.pub
+
+# - name: Verify Permissions on SSH Server Private *_key Key Files - on redhat 7.X
+# #  command: chmod 0644 /etc/ssh/*_pub
+#   command: chmod 0400 /etc/ssh/{{item}}
+#   with_items:
+#     - ssh_host_ecdsa_key
+#     - ssh_host_ed25519_key
+#     - ssh_host_rsa_key
+
+- name: Disable X Windows Startup By Setting Default Target - on redhat 7.X
+  command: systemctl set-default multi-user.target
+
+- name: Uninstall DHCP Server Package - on redhat 7.X
+  yum:
+    name: dhcp
+    state: absent
+
+- name: Uninstall Sendmail package - on redhat 7.X
+  yum:
+    name: sendmail
+    state: absent
+
+- name: Uninstall bind package - on redhat 7.X
+  yum:
+    name: bind
+    state: absent
+
+- name: Uninstall vsftp package - on redhat 7.X
+  yum:
+    name: vsftp
+    state: absent
+
+- name: Uninstall dovecot package - on redhat 7.X
+  yum:
+    name: dovecot
+    state: absent
+
+- name: Uninstall net-snmp package - on redhat 7.X
+  yum:
+    name: net-snmp
+    state: absent

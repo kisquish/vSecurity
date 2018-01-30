@@ -1,0 +1,20 @@
+---
+- name: make sure some packages are installed on CentOS_6.X
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - curl
+    - libselinux-python
+
+- name: installing OpenSCAP packages on CentOS_6.X
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - openscap-scanner
+    - scap-workbench
+
+- name: create directory to store results & reports
+  file:
+    path: "{{ centRemoteScapDirectory }}"
+    state: directory
+    mode: 0755

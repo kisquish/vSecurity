@@ -1,0 +1,26 @@
+---
+# tasks file for roles/rhel-prerequisites
+
+# - name: set timezone to UTC
+#     name: utc
+
+- name: make sure some packages are installed on RedHat_7.X
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - curl
+    - libselinux-python
+
+- name: installing OpenSCAP packages on RedHat_7.X
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - openscap-scanner
+    - scap-security-guide
+    - scap-workbench
+
+- name: create directory to store results & reports
+  file:
+    path: "{{ rhRemoteScapDirectory }}"
+    state: directory
+    mode: 0755

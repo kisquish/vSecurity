@@ -1,0 +1,31 @@
+---
+# tasks file for roles/rhel7-stig-server-scan
+
+# - name: transfert NON TAILORING profiles to remote hosts
+#   copy:
+#     src: ssg-rhel7-ds.xml
+#     dest: "{{ rhRemoteScapDirectory }}ssg-rhel7-ds.xml"
+#     mode: "u=rw,g=r,o=r"
+
+# - name: transfert TAILORING profiles to remote hosts
+#   copy:
+#     src: ssg-rhel7-ds-tailoring.xml
+#     dest: "{{ rhRemoteScapDirectory }}ssg-rhel7-ds-tailoring.xml"
+#     mode: "u=rw,g=r,o=r"
+
+- name: Get Information SCAP Content from STIG SERVER profile - on redhat 6.X
+  command: oscap info /usr/share/xml/scap/ssg/content/ssg-rhel6-ds.xml
+  register: result
+
+- name: Displaying Lists of profiles from STIG SERVER profile - on redhat 6.X
+  debug:
+    var: result.stdout_lines
+
+- name: SCAN The system to evaluate STIG SERVER UPSTREAM Profile - on redhat 6.X
+  command: oscap xccdf eval --fetch-remote-resources --profile xccdf_org.ssgproject.content_profile_stig-rhel6-server-upstream --results-arf {{ rhRemoteScapDirectory }}{{ rh6StigServerProfileScanResultName }} --report {{ rhRemoteScapDirectory }}{{ rh6StigServerProfileScanReportName }} {{ rhPathToGetProfiles }}ssg-rhel6-ds.xml
+  register: output
+  ignore_errors: yes
+
+# - name: Displaying scanning output - on redhat 6.X
+#   debug:
+#     var: output.stdout_lines

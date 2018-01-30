@@ -1,0 +1,6 @@
+---
+# tasks file for roles/Win_setTimeZone/
+
+- name: set timezone to paris (GMT+1)
+  win_timezone:
+    timezone: Romance Standard Time

@@ -1,0 +1,38 @@
+---
+
+- name: create scap-tools on remote targets - on CentOS_6.X
+  file:
+    path: "{{ centRemoteScapDirectoryTools }}"
+    state: directory
+# #    mode: 0755
+
+- name: transfert scap tools on remote targets - on CentOS_6.X
+  copy:
+    src: cent6-scap-tools/
+    dest: "{{ centRemoteScapDirectoryTools }}cent6-scap-tools"
+# #    directory_mode: True
+    force: yes
+
+- name: make sure some packages are installed on CentOS_6.X
+  yum:
+#    name: "{{ centRemoteScapDirectoryTools }}cent6-scap-tools/{{ item }}"
+    name: "{{ item }}"
+  with_items:
+    - curl
+    - libselinux-python
+
+- name: installing OpenSCAP packages on CentOS_6.X
+  yum:
+#    name: "{{ item }}"
+    name: "{{ centRemoteScapDirectoryTools }}cent6-scap-tools/{{ item }}"
+  with_items:
+    - openscap-scanner-1.2.13-2.el6.x86_64.rpm
+    - scap-workbench-1.1.1-1.el6.x86_64.rpm
+    #- openscap-scanner
+    #- scap-workbench
+
+- name: create directory to store results & reports - on CentOS_6.X
+  file:
+    path: "{{ centRemoteScapDirectory }}"
+    state: directory
+    mode: 0755

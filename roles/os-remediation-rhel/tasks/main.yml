@@ -1,0 +1,18 @@
+---
+# tasks file for os-remediation-rhel
+- name: remediate redhat 6.X
+  include: rhel6-X-faileRules.yml
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "6"
+#    - ansible_os_family == "6"
+
+- name: remediate redhat 7.X
+  include: "{{item}}"
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+#    - ansible_os_family == "RedHat"
+  with_items:
+    - rhel7-X-failedRules.yml
+    - rhel7-X-passedRules.yml
