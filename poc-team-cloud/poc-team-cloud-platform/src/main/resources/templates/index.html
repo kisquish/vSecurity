@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Welcome to Poc-Team-Cloud Platform</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	
+	<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+	<link href="/assets/css/main.css" th:href="@{/assets/css/main.css}" rel="stylesheet" />
+	<link href="/assets/bootstrap/css/bootstrap.css" th:href="@{/assets/bootstrap/css/bootstrap.css}" rel="stylesheet" />
+
+	<script src="/assets/scripts/jquery.min.js"  th:href="@{/assets/scripts/jquery.min.js}"></script>
+	<script src="/assets/bootstrap/js/bootstrap.js"></script>
+	<script src="/assets/js/header.js"></script>
+	
+	<!-- footer -->   
+	<link href="/assets/bootstrap/css/bootstrap.min.css" th:href="@{/assets/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+   <link href="/assets/font/css/font-awesome.min.css" th:href="@{/assets/font/css/font-awesome.min.css}" rel="stylesheet"/>
+   <link href="/assets/css/footer.css" th:href="@{/assets/css/footer.css}" rel="stylesheet"/>
+
+	<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+</head>
+
+<body >
+
+	<!-- Header -->
+	<header th:replace="header :: header" >
+<!-- 		<div class="inner"> -->
+<!-- 			<div class ="avatar image" th:each="member : ${ourTeam}"> -->
+<!-- 				<a href="#"> -->
+<!-- 					<img src="/images/avatar.jpg" alt="" /> -->
+<!-- 				</a> -->
+<!-- 				<br/> -->
+<!-- 				<span th:text="${member.lastName}">name</span> -->
+<!-- 				<br/> -->
+<!-- 				<p th:text="${member.role}">role</p> -->
+<!-- 				<ul class="icons"> -->
+<!-- 				<li><a href="#" class="icon fa-github"><span class="label">Github</span></a></li> -->
+<!-- 				<li><a href="#" class="icon fa-linkedin"><span class="label">LinkedIn</span></a></li> -->
+<!-- 			</ul> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+	</header>
+
+	<!-- Main -->
+
+	<div class="container">
+		<!-- One -->
+		<div class="col-xs-12 col-sm-12">
+<!-- 		<div class="col-xs-12"> -->
+			<header class="major text-justify">
+				<h2 >About US.</h2>
+			</header>
+			
+			<p class="text-justify">	<strong> We are P-T-C !</strong> The team, which think
+				perform and realize the implementation and the maintain of this
+				platform here are our gitHub <a
+					href="https://github.com/Aetsmtl/poc-team-cloud">
+					pocTeamCloud-Open-Source-GitHub-Project</a>.<br /> And we are just
+				below ! </p>
+<!-- 			<ul class="actions"> -->
+<!-- 				<li><a href="#" class="button">Learn More</a></li> -->
+<!-- 			</ul> -->
+<!-- 		</div> -->
+		
+
+		
+		
+		<!-- four -->
+		<!--  <section id="one">
+			<header class="major">
+				<h2>Go to all of our projects :-)</h2>
+			</header>
+			<a href = "projects" th:href="@{/pj}"> Here /!\ </a>
+		</section> -->
+
+		<!-- Two -->
+		
+		<section id="two">
+		
+			<header class="major">
+				<h2>Recent Works</h2>
+			</header>
+			<div class="row" >
+				<article class="6u 12u$(xsmall) work-item" th:each="project : ${ourProject}">
+					<p><a href="images/fulls/01.jpg" class="image fit thumb "> <img
+						src="images/thumbs/01.jpg" class="img-rounded img-responsive " alt=""/></a></p>
+					<p><a th:href="@{/pj/{pID}(pID=${project.id})}" href="projectX" th:text="${project.name}">
+						Project x </a></p>
+					<p th:text="${project.description}">Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
+
+				</article>
+			</div>
+			<div>
+			<ul class="actions">
+        			<li><a href="Project" th:href="@{/pj}" class="button">view projects</a></li>
+			</ul>
+			</div>
+			
+		</section>
+		
+		<!-- five -->
+		<!-- <section id="one">
+			<header class="major">
+				<h2>Go to all of our members :-)</h2>
+			</header>
+			<a href = "members" th:href="@{/mb}"> Here /!\ </a>
+		</section> -->
+		
+		
+		<!-- six -->
+		
+		<section id="two">
+		
+			<header class="major">
+				<h2>Recent Members</h2>
+			</header>
+			<div class="row" >
+			<article class="6u 12u$(xsmall) work-item" th:each="memb : ${ourTeam}">
+				<div class="align">
+						<a href="images/fulls/01.jpg" class="image fit thumb"> <img src="images/thumbs/01.jpg"  alt=""  class="img-circle" width="100" height="105"/></a>
+				<br></br>
+				</div>
+			<div class="align">
+			<a th:href="@{/mb/{pID}(pID=${memb.id})}" href="memberX" th:text="${memb.lastName}">
+						Project x </a>
+					<p th:text="${memb.lastName}">Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
+			</div>
+				 
+			 <ul class="icons">
+			        <li><a href="#" class="icon fa-github"><span class="label">Github</span></a></li>
+			        <li><a href="#" class="icon fa-linkedin"><span class="label">LinkedIn</span></a></li>
+			        <li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+			  </ul>
+				</article>
+			</div>
+			<div>
+			<ul class="actions">
+        			<li><a href="members" th:href="@{/mb}" class="button">View Members</a></li>
+			</ul>
+			</div>
+			
+		</section>
+		
+	
+		
+		<!-- Three -->
+		
+
+			<header class="major">
+				<h2>Get In Touch</h2>
+			</header>
+			
+			<p>Accumsan pellentesque commodo blandit enim arcu non at amet id
+				arcu magna. Accumsan orci faucibus id eu lorem semper nunc nisi
+				lorem vulputate lorem neque lorem ipsum dolor.</p>
+			
+			<div class="row"></div>
+
+		</div>
+
+		</div>
+		
+
+
+	<!-- Footer -->
+	<footer id="footer" th:replace="footer :: footer"></footer>
+
+</body>
+
+</html>

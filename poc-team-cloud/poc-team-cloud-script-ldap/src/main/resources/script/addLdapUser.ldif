@@ -1,0 +1,15 @@
+dn: ou=peoples,dc=pocteamcloud,dc=com
+objectClass: organizationalUnit
+ou: Peoples
+ 
+dn: uid=notable,ou=peoples,dc=pocteamcloud,dc=com
+cn: David Takoubo
+sn: David
+objectClass: inetOrgPerson
+userPassword: Password01
+uid: notable
+ 
+dn: cn=users,ou=peoples,dc=pocteamcloud,dc=com
+cn: Users
+objectClass: groupOfUniqueNames
+uniqueMember: uid=notable,ou=peoples,dc=pocteamcloud,dc=com

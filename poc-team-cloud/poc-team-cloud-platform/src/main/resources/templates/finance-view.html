@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title>Finance management - poc-team-Cloud</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+<link href="/assets/css/main.css" th:href="@{/assets/css/main.css}"
+	rel="stylesheet" />
+<link href="/assets/bootstrap/css/bootstrap.css"
+	th:href="@{/assets/bootstrap/css/bootstrap.css}" rel="stylesheet" />
+
+<script src="/assets/scripts/jquery.min.js"
+	th:href="@{/assets/scripts/jquery.min.js}"></script>
+<script src="/assets/bootstrap/js/bootstrap.js"></script>
+<script src="/assets/js/header.js"></script>
+
+<!-- footer -->
+<link href="/assets/bootstrap/css/bootstrap.min.css"
+	th:href="@{/assets/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+<link href="/assets/font/css/font-awesome.min.css"
+	th:href="@{/assets/font/css/font-awesome.min.css}" rel="stylesheet" />
+<link href="/assets/css/footer.css" th:href="@{/assets/css/footer.css}"
+	rel="stylesheet" />
+
+<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+</head>
+
+<body id="top">
+	<!-- Header -->
+	<header id="header" th:replace="header :: header"> </header>
+
+	<!-- Main -->
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12 col-md-12">
+				<h3>Recapitulatif</h3>
+				<table class="table table-responsive table-bordered"
+					th:each="item : ${ptcFinSolde}">
+					<tr>
+						<td>
+							<div>
+								<p></p>
+								<h5>Currently solde</h5>
+
+
+								<div class="page-header">
+
+									<h1 th:text="${item.solde} + ' €'">
+										<small>An intuitive front-end framework</small>
+									</h1>
+								</div>
+
+							</div>
+							<div>
+								<h3>Last operation</h3>
+								<p th:text="${item.op.name}"></p>
+								<p th:text="${item.op.amount} + ' €'"></p>
+								<p th:text="${item.op.date}"></p>
+								<p th:text="${item.op.description}"></p>
+								<p></p>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-12 col-sm-6 col-md-2">
+				<h3>Comptes</h3>
+				<ul class="list-group">
+					<li class="list-group-item">Contributors</li>
+					<li class="list-group-item">Téléchargement</li>
+					<li class="list-group-item">Consultation</li>
+					<li class="list-group-item">Dépenses et revenus</li>
+					<li class="list-group-item">Situation</li>
+				</ul>
+			</div>
+			<div class="col-xs-12 col-sm-12 col-md-8">
+				<h3>Operations</h3>
+
+				<table class="table table-responsive table-bordered table-striped">
+					<thead class="thead-inverse">
+						<tr>
+							<th>Owner</th>
+							<th>Description</th>
+							<th>Amount</th>
+							<th>Date</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item : ${ptcFinOps}">
+							<td th:text="${item.name}">Jill</td>
+							<td th:text="${item.description}">Smith</td>
+							<td th:text="${item.amount} + ' €'">50</td>
+							<td th:text="${item.date}">50</td>
+						</tr>
+					</tbody>
+
+				</table>
+			</div>
+			<div class="col-xs-12 col-sm-6 col-md-2">
+				<h3>Pub</h3>
+
+				<table class="table table-responsive table-bordered table-striped">
+					<tbody>
+						<tr>
+							<td>
+								<h1>PUB 1</h1>
+
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<h1>PUB 2</h1>
+
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<h1>PUB 3</h1>
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+		<div class="border row align-items-end ">
+			<div class="col col-xs-12 col-sm-6 col-md-2">ddddddddddddddOne of three columns</div>
+			<div class="col col-xs-12 col-sm-6 col-md-8">One of three columns</div>
+			<div class="col col-xs-12 col-sm-6 col-md-2">One of three columns</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<footer id="footer" th:replace="footer :: footer"> </footer>
+</body>
+</html>

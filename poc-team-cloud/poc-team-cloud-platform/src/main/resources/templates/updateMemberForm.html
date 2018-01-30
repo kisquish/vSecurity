@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Member : Updating</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	
+	<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+	<link href="/assets/css/main.css" th:href="@{/assets/css/main.css}" rel="stylesheet" />
+	<link href="/assets/bootstrap/css/bootstrap.css" th:href="@{/assets/bootstrap/css/bootstrap.css}" rel="stylesheet" />
+
+	<script src="/assets/scripts/jquery.min.js"  th:href="@{/assets/scripts/jquery.min.js}"></script>
+	<script src="/assets/bootstrap/js/bootstrap.js"></script>
+	<script src="/assets/js/header.js"></script>
+	
+	<!-- footer -->   
+	<link href="/assets/bootstrap/css/bootstrap.min.css" th:href="@{/assets/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+   <link href="/assets/font/css/font-awesome.min.css" th:href="@{/assets/font/css/font-awesome.min.css}" rel="stylesheet"/>
+   <link href="/assets/css/footer.css" th:href="@{/assets/css/footer.css}" rel="stylesheet"/>
+
+	<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+
+</head>
+
+<body id="top">
+	<!-- Header -->
+	<header id="header" th:replace="header :: header" >
+		<div class="inner">
+			<div class="avatar image" th:each="member : ${ourTeam}">
+				<a href="#"> <img src="images/avatar.jpg" alt="" />
+				</a> <br /> <span th:text="${member.lastName}">name</span>
+				<!-- <br/> -->
+				<!-- <p th:text="${member.role}">role</p> -->
+				<ul class="icons">
+					<li><a href="#" class="icon fa-github"><span class="label">Github</span></a></li>
+					<li><a href="#" class="icon fa-linkedin"><span
+							class="label">LinkedIn</span></a></li>
+				</ul>
+			</div>
+		</div>
+	</header>
+
+	<div class="container">
+		<!-- Menu -->
+	<!--  	<ul id="menu">
+			<li><a href="index" th:href="@{/}">Home</a></li>
+			<li><a href="#">Projet</a>
+				<ul>
+					<li><a href="#">View Projet</a></li>
+					<li><a href="#">Creer Projet</a></li>
+				</ul></li>
+			<li><a href="#">Membre</a>
+				<ul>
+					<li><a href="#">Profile</a></li>
+					<li><a href="#">Ajoute Membre</a></li>
+				</ul></li>
+			<li><a href="#">About</a></li>
+			<li><a href="#">Contact</a></li>
+		</ul>-->
+		<!-- ContainerBodyPage -->
+		<div class="col-xs-12 col-sm-12">
+		<div class="container">
+			<form action="#" th:action="@{/mb/{id}/up(id=${memb.id})}"
+				th:object="${memb}" method="post">
+<!-- 				<div> -->
+<!-- 					<a href="index" th:href="@{/}"> Return to Home page </a> -->
+<!-- 				</div> -->
+				<!-- create a project -->
+				<div>
+					<br></br>
+					<h2>Update a Member</h2>
+					<br></br>
+				</div>
+				<div>
+					<label for="surname">surName</label> 
+					<input type="text" th:field="*{surName}" /> 	
+					<label for="lastName">lastName</label> 
+					<input type="text" th:field="*{lastName}"/> 
+					<label for="linkedinUrlRef">linkedIn Url Ref</label> 
+					<input type="text" th:field="*{linkedinUrlRef}"/>
+					
+<!-- 					<label for="versionningLink">Versionning link</label>  -->
+<!-- 					<input type="url" th:field="*{versionningLink}"/> -->
+<!-- 					<label for="contributions">Contributors</label>  -->
+<!-- 					<input type="text" th:field="*{contributors}"/> -->
+					<br></br><br></br>
+					<input type="submit" value="Update" />
+				</div>
+			</form>
+		</div>
+	</div>
+	</div>
+<!-- Footer -->
+	<footer id="footer" th:replace="footer :: footer"></footer>
+</body>
+</html>

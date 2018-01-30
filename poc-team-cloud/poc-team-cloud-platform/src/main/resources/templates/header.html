@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+<!-- 		<title>PoC-TeamCloud</title> -->
+		   <meta charset="utf-8" />
+		   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+		   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+		   
+		   <link href="/assets/css/main.css" th:href="@{/assets/css/main.css}" rel="stylesheet" />
+		   <link href="/assets/bootstrap/css/bootstrap.css" th:href="@{/assets/bootstrap/css/bootstrap.css}" rel="stylesheet" />
+		   <link href="/assets/bootstrap/css/bootstrap-theme.min.css" th:href="@{/assets/bootstrap/css/bootstrap-theme.min.css}" rel="stylesheet" />
+		   <script src="/assets/scripts/jquery.min.js"  th:href="@{/assets/scripts/jquery.min.js}"></script>
+		   <script src="/assets/bootstrap/js/bootstrap.min.js" th:href="@{/assets/bootstrap/js/bootstrap.min.js"></script>
+<!-- 		   <script src="/assets/js/header.js"></script> -->
+	</head>
+
+	<body>
+		<!-- Header -->
+		<header th:fragment="header">
+<!-- 		  <div class="container" > -->
+		  <!-- nav-bar -->
+      
+<!-- 		<nav class="navbar navbar-inverse navbar-fixed-top  marginBottom-0" role="navigation" > -->
+ 		<nav class="navbar navbar-default navbar-fixed-top" role="navigation" >
+ 		
+ 		<div class="container"> 
+<!--       			 <div class="row"> -->
+					  <div class="navbar-header">
+					   
+						    <button type="button" 
+						    		class="navbar-toggle collapsed"
+						   			data-toggle="collapse" 
+						   			data-target="#navbar"
+						   			aria-expanded="false" 
+						   			aria-controls="navbar">
+						   			
+<!-- 						      <span class="sr-only">Toggle navigation</span> -->
+						      <span class="icon-bar"></span>
+						      <span class="icon-bar"></span>
+						      <span class="icon-bar"></span>
+						    </button>  
+						  
+			 			   	<br></br><a class="nav-brand" href="#index" th:href="@{/}"><b>PoC-TeamCloud </b></a>
+						   
+					   </div>
+				 
+			  
+			  <div id="navbar" class="navbar-collapse collapse" >
+					    <div class="col-sm-3 col-md-3">
+					        <form class="navbar-form" role="search">
+						        <div class="input-group">
+						            <input type="text" class="form-control" placeholder="Search" name="q"></input>
+						            <div class="input-group-btn"> 
+			 			                <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button> 
+						            </div>
+						        </div>
+					        </form>
+					    </div >
+        
+			    <ul  class="nav navbar-nav navbar-right">
+			      <li ><a href="#index" th:href="@{/}">Home</a></li>
+			      <li class="dropdown">
+			      <a  class="dropdown-toggle" data-toggle="dropdown" href="#">Project<span class="caret"></span></a>
+			      		<ul class="dropdown-menu">
+            						<li><a href="#" ><span class="glyphicon glyphicon-cloud"></span>Virtualization</a></li>
+            						<li><a href="#"><span class="glyphicon glyphicon-cog"></span>DevOps</a></li>
+            						<li><a href="#"><span class="glyphicon glyphicon-phone"></span>Embedded System</a></li>
+            						<li><a href="#"><span class="glyphicon glyphicon-lock"></span>Security</a></li>
+            						<li><a href="#"><span class="glyphicon glyphicon-signal"></span>Network</a></li>
+            						<li><a href="#"><span class="glyphicon glyphicon-globe"></span>Web Programming</a></li>
+            						<li class="divider"></li>
+            						<li><a href = "projects" th:href="@{/pj(form)}"><span class="glyphicon glyphicon-plus"></span>Add Project</a></li>
+            						<li><a href="projects" th:href="@{/pj}"><span class="glyphicon glyphicon-list-alt"></span>View Project</a></li>
+        
+          				</ul>
+			      </li>
+			      <li class="dropdown">
+			      <a class="dropdown-toggle" data-toggle="dropdown" href="#" >Member<span class="caret"></span></a>
+			      		<ul class="dropdown-menu">
+			      			<li><a href = "members" th:href="@{/mb(form)}"><span class="glyphicon glyphicon-plus"></span>Add Member</a></li>
+            				<li><a href="members" th:href="@{/mb}"><span class="glyphicon glyphicon-list-alt"></span>View Member</a></li>
+			      		</ul>
+			      </li>
+			      <li><a href="#contact">About</a></li>
+			      <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+			    </ul>
+	
+
+			  	</div>
+			</div> 
+		</nav>
+<!-- 		  </div> -->
+		
+		  <div class="jumbotron">
+		   <p style="padding:10px;"></p>
+		   <div class = "container">
+		  	<div class="title">
+		      <h1 th:text=" '>> ' + ${jumTitle}">ptc</h1>
+		     <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+		   </div>
+		   </div>
+		  </div>
+		</header>
+<!--  </header> -->
+
+	</body>
+
+</html>
