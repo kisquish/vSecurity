@@ -37,7 +37,7 @@ else
 	--name $hostName \
 	--ram=$ramSize \
 	--vcpus=$cpuNumber \
-	--disk path=/home/ptcadm/vmDisks/$hostName.img,size=$diskSize \
+	--disk path=/var/lib/libvirt/images/$hostName.img,size=$diskSize \
 	--graphics none \
 	--location=/var/lib/libvirt/images/CentOS-7-x86_64-Minimal-1611.iso \
 	--extra-args="console=tty0 console=ttyS0,115200"
