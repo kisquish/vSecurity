@@ -1,0 +1,10 @@
+<network>
+  <name>virbr-db-sync</name>
+  <bridge name="virbr-db-sync"/>
+  <forward mode="nat"/>
+  <ip address="192.168.1.1" netmask="255.255.255.0">
+    <dhcp>
+      <range start="192.168.1.2" end="192.168.1.254"/>
+    </dhcp>
+  </ip>
+</network>
